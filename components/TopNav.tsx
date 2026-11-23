@@ -1,6 +1,6 @@
 "use client";
 
-// Design Ref: §3.1 공통 틀 — 왼쪽 위에 [처음으로]와 [참고]를 모든 화면에서 늘 누를 수 있게 둔다.
+// Design Ref: §3.1 공통 틀 — 맨 위 검정 띠 왼쪽에 [처음으로]와 [참고]를 모든 화면에서 늘 누를 수 있게 둔다.
 
 import Link from "next/link";
 import { requestStart } from "../lib/startSignal";
@@ -8,7 +8,7 @@ import { InfoButton } from "./InfoButton";
 
 export function TopNav() {
   return (
-    <div className="fixed left-4 top-4 z-50 flex items-start gap-2">
+    <div className="fixed inset-x-0 top-0 z-50 flex h-14 items-center gap-2 bg-black px-4">
       <Link
         href="/"
         onClick={() => requestStart()}

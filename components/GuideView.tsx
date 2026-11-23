@@ -15,7 +15,7 @@ export function GuideView({ exercise }: { exercise: Exercise }) {
         <p className="text-sm font-medium text-faint">
           {exercise.sports.join("·")} · {exercise.bodyParts.join("·")} · {exercise.purpose}
         </p>
-        <h1 className="mt-3 text-[clamp(30px,4vw,48px)] font-medium leading-[1.12] tracking-[-0.03em]">
+        <h1 className="mt-3 text-[clamp(30px,4vw,48px)] font-extrabold leading-[1.12] tracking-[-0.03em]">
           {exercise.name}
         </h1>
         <p className="mt-3 leading-7 text-muted">{exercise.description}</p>

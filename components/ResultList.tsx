@@ -169,7 +169,7 @@ export function ResultList({
         <h2
           id="step-heading"
           tabIndex={-1}
-          className="text-center text-[clamp(28px,3.6vw,44px)] font-medium leading-[1.12] tracking-[-0.03em] outline-none"
+          className="text-center text-[clamp(28px,3.6vw,44px)] font-extrabold leading-[1.12] tracking-[-0.03em] outline-none"
         >
           {result.status === "ok" ? "추천 운동" : "안내"}
         </h2>
