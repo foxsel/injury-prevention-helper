@@ -9,7 +9,8 @@
 // 현재 채워진 범위
 // - 발목 회복 운동 4개 (모든 지원 종목 공통)  ← AAFP 발목 염좌 환자 안내
 // - 발목·무릎 예방 운동 6개 (모든 지원 종목 공통) ← FIFA 11+ 부상 예방 소책자
-// 아직 비어 있는 범위: 무릎 회복, 어깨 예방, 어깨 회복
+// - 무릎 회복 운동 3개, 어깨 회복 운동 4개 (모든 지원 종목 공통) ← 분당서울대병원 수술 후 운동교육
+// 아직 비어 있는 범위: 어깨 예방
 //   → 근거 자료를 확인한 뒤 같은 형식으로 추가한다.
 
 import { SPORTS, STOP_CRITERIA_TEXT } from "../constants";
@@ -48,6 +49,21 @@ const SOFT_LANDING_CAUTION = "발볼로 무릎을 굽히며 부드럽게 착지�
 // 자료에는 없고 우리가 덧붙인 안전 문구: 충격이 큰 점프 운동용
 const HIGH_IMPACT_CAUTION =
   "충격이 큰 운동이다. 발목이나 무릎에 통증이나 불편감이 있으면 이 운동은 건너뛴다.";
+
+// ───────────────────────────────────────────────────────────────
+// 무릎·어깨 회복 운동
+// 참고 자료: 분당서울대병원 재활의학과 환자교육 "무릎관절 수술후 운동교육",
+// "어깨관절 수술후 운동교육". 인공관절 수술을 받은 환자를 위한 시기별 프로그램이다.
+// 횟수·세트·유지 시간은 이 자료의 수치를 따르고, 자료에 없는 값은 만들지 않았다.
+// 우리가 정한 것: 운동 선택, 부연설명 문장, 아래 수술 관련 안내 문구.
+// (이 자료에는 통증 중단 기준과 병원 방문 기준이 적혀 있지 않다.)
+// ───────────────────────────────────────────────────────────────
+const SNUBH_KNEE = "분당서울대병원 재활의학과 환자교육: 무릎관절 수술후 운동교육";
+const SNUBH_SHOULDER = "분당서울대병원 재활의학과 환자교육: 어깨관절 수술후 운동교육";
+
+// 자료에는 없고 우리가 덧붙인 안전 문구: 수술 후 프로그램을 참고했기 때문
+const SURGERY_CAUTION =
+  "수술을 받았다면 담당 의료진이 정한 시기와 운동 범위를 먼저 따른다.";
 
 export const EXERCISES: Exercise[] = [
   // ── 발목 회복 (AAFP) ─────────────────────────────────────────
@@ -294,5 +310,179 @@ export const EXERCISES: Exercise[] = [
     ],
     stopCriteria: [STOP_CRITERIA_TEXT],
     source: FIFA_11_PLUS,
+  },
+
+  // ── 무릎 회복 (분당서울대병원) ───────────────────────────────
+  {
+    id: "knee-heel-slide-01",
+    highImpact: false,
+    name: "발바닥 미끄러뜨려 무릎 굽히기",
+    description:
+      "누운 채 발을 바닥에 미끄러뜨려 무릎을 굽혔다 펴며 무릎이 움직이는 범위를 되찾는 운동입니다. 무릎 앞쪽에 약간의 압박감이 느껴지는 것은 자료에서 정상적인 느낌이라고 안내합니다.",
+    sports: [...SPORTS],
+    bodyParts: ["무릎"],
+    purpose: "회복",
+    steps: [
+      "바닥에 누워 다리를 편하게 뻗는다.",
+      "발을 바닥에 미끄러뜨리며 엉덩이 쪽으로 당겨 무릎을 굽힌다.",
+      "5~10초 동안 유지한다.",
+      "발을 다시 밀어 무릎을 충분히 펴고, 같은 동작을 반복한다.",
+    ],
+    reps: "5~10초 유지, 20회",
+    sets: "하루 3세트",
+    cautions: [
+      SURGERY_CAUTION,
+      "무릎 앞쪽의 약한 압박감은 있을 수 있다. 이 압박감과 달리 통증이 심해지면 중단 기준을 따른다.",
+    ],
+    stopCriteria: [STOP_CRITERIA_TEXT],
+    source: SNUBH_KNEE,
+  },
+  {
+    id: "knee-quad-set-01",
+    highImpact: false,
+    name: "허벅지 근육 조이기",
+    description:
+      "무릎을 쭉 편 채 허벅지 앞 근육에 힘을 꽉 주었다 푸는 기초 근력 운동입니다.",
+    sports: [...SPORTS],
+    bodyParts: ["무릎"],
+    purpose: "회복",
+    steps: [
+      "앉거나 누워서 무릎을 충분히 쭉 편다.",
+      "허벅지 근육에 최대한 힘을 준다.",
+      "5~10초 동안 유지한 뒤 힘을 푼다.",
+      "같은 동작을 2~3분 동안 반복한다.",
+    ],
+    reps: "5~10초 유지를 2~3분 동안 반복",
+    sets: "정해진 세트 수 없음(2~3분 단위로 진행)",
+    cautions: [
+      SURGERY_CAUTION,
+      "무릎을 완전히 편 상태에서 허벅지에 힘이 들어가는지 확인한다.",
+    ],
+    stopCriteria: [STOP_CRITERIA_TEXT],
+    source: SNUBH_KNEE,
+  },
+  {
+    id: "knee-mini-squat-01",
+    highImpact: false,
+    name: "벽에 기대 쪼그리기(미니 스쿼트)",
+    description:
+      "벽에 어깨를 대고 살짝 쪼그려 앉았다 일어나는 기초 하체 근력 운동입니다. 체중을 발 전체에 고르게 싣는 것이 핵심입니다.",
+    sports: [...SPORTS],
+    bodyParts: ["무릎"],
+    purpose: "회복",
+    steps: [
+      "발을 어깨 너비로 벌리고, 어깨가 벽에 닿게 선다.",
+      "엉덩이와 무릎을 굽혀 살짝 쪼그려 앉는다.",
+      "체중이 발 전체에 고르게 실리게 한다.",
+      "천천히 일어나 같은 동작을 반복한다.",
+    ],
+    reps: "10~15회",
+    sets: "하루 3번",
+    cautions: [
+      SURGERY_CAUTION,
+      "체중이 한쪽으로 쏠리지 않고 발 전체에 고르게 실리게 한다.",
+    ],
+    stopCriteria: [STOP_CRITERIA_TEXT],
+    source: SNUBH_KNEE,
+  },
+
+  // ── 어깨 회복 (분당서울대병원) ───────────────────────────────
+  {
+    id: "shoulder-band-external-rotation-01",
+    highImpact: false,
+    name: "밴드 바깥돌림(외회전)",
+    description:
+      "탄력 밴드의 저항을 이용해 팔을 몸 바깥쪽으로 돌리며 어깨 주변 근육을 키우는 운동입니다. 팔꿈치 각도를 유지하고 통증 없는 범위에서만 움직이세요.",
+    sports: [...SPORTS],
+    bodyParts: ["어깨"],
+    purpose: "회복",
+    steps: [
+      "탄력 밴드를 허리 높이에 고정하고, 안쪽돌림 운동과 반대쪽에 선다. (자료에서는 주로 노란색이나 주황색 밴드를 쓴다.)",
+      "팔꿈치를 90도로 굽힌 자세를 유지한다.",
+      "통증 없는 범위에서 팔을 몸 바깥쪽으로 천천히 당긴다.",
+      "천천히 돌아온다.",
+    ],
+    reps: "10회",
+    sets: "하루 3번",
+    cautions: [
+      SURGERY_CAUTION,
+      "통증 없는 범위 안에서 천천히 당긴다.",
+      "운동하는 동안 팔꿈치를 굽힌 각도를 바꾸지 않는다.",
+    ],
+    stopCriteria: [STOP_CRITERIA_TEXT],
+    source: SNUBH_SHOULDER,
+  },
+  {
+    id: "shoulder-band-internal-rotation-01",
+    highImpact: false,
+    name: "밴드 안쪽돌림(내회전)",
+    description:
+      "탄력 밴드의 저항을 이용해 팔을 몸 쪽으로 돌리며 어깨 주변 근육을 키우는 운동입니다. 팔꿈치 각도를 유지하고 통증 없는 범위에서만 움직이세요.",
+    sports: [...SPORTS],
+    bodyParts: ["어깨"],
+    purpose: "회복",
+    steps: [
+      "탄력 밴드를 허리 높이에 고정한다. (자료에서는 주로 노란색이나 주황색 밴드를 쓴다.)",
+      "팔꿈치를 90도로 굽힌 자세를 유지한다.",
+      "통증 없는 범위에서 팔을 몸 쪽으로 천천히 당긴다.",
+      "천천히 돌아온다.",
+    ],
+    reps: "10회",
+    sets: "하루 3번",
+    cautions: [
+      SURGERY_CAUTION,
+      "통증 없는 범위 안에서 천천히 당긴다.",
+      "운동하는 동안 팔꿈치를 굽힌 각도를 바꾸지 않는다.",
+    ],
+    stopCriteria: [STOP_CRITERIA_TEXT],
+    source: SNUBH_SHOULDER,
+  },
+  {
+    id: "shoulder-towel-wall-slide-01",
+    highImpact: false,
+    name: "수건 벽 밀기",
+    description:
+      "수건으로 벽을 짚고 팔을 벽을 따라 밀어 올리며 어깨의 움직임 범위를 넓히는 운동입니다. 건강한 손이 아픈 팔의 팔꿈치를 받쳐 줍니다.",
+    sports: [...SPORTS],
+    bodyParts: ["어깨"],
+    purpose: "회복",
+    steps: [
+      "벽을 향해 서서 아픈 쪽 손으로 수건을 잡고 벽에 댄다.",
+      "건강한 손으로 아픈 쪽 팔꿈치를 받쳐 준다.",
+      "수건을 벽을 따라 천천히 밀어 올린다.",
+      "더 올라가지 않으면 몸을 벽에 가까이 붙여 조금 더 올리고 5초 동안 머문다.",
+    ],
+    reps: "10회",
+    sets: "하루 3번",
+    cautions: [
+      SURGERY_CAUTION,
+      "건강한 손으로 팔꿈치를 받쳐 아픈 팔에 무리가 가지 않게 한다.",
+    ],
+    stopCriteria: [STOP_CRITERIA_TEXT],
+    source: SNUBH_SHOULDER,
+  },
+  {
+    id: "shoulder-lower-trap-band-01",
+    highImpact: false,
+    name: "밴드 날개뼈 모으기(하부 승모근)",
+    description:
+      "날개뼈 아래쪽 근육을 써서 날개뼈를 모아 주는 운동입니다. 자료에서는 날개뼈 주변 근육이 약해지는 것을 막기 위한 운동으로 소개합니다.",
+    sports: [...SPORTS],
+    bodyParts: ["어깨"],
+    purpose: "회복",
+    steps: [
+      "탄력 밴드를 양 손바닥에 감아 잡는다.",
+      "팔꿈치를 90도로 굽혀 옆구리에 붙인다.",
+      "날개뼈를 모으듯 가슴을 앞으로 내민다.",
+      "천천히 돌아온다.",
+    ],
+    reps: "10회",
+    sets: "하루 3번",
+    cautions: [
+      SURGERY_CAUTION,
+      "팔꿈치를 90도로 굽혀 옆구리에 붙인 자세를 유지한다.",
+    ],
+    stopCriteria: [STOP_CRITERIA_TEXT],
+    source: SNUBH_SHOULDER,
   },
 ];
