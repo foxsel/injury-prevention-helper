@@ -8,7 +8,7 @@ import {
   analyzeTrend,
   entriesFor,
   improvingExerciseIds,
-  lastPainBefore,
+  lastPainAfter,
   parseLog,
   serializeLog,
   type LogEntry,
@@ -93,22 +93,21 @@ describe("통증 변화 분석", () => {
   });
 });
 
-describe("운동별 기록 고르기와 운동 전 통증 이어받기", () => {
+describe("운동별 기록 고르기와 지난 운동 후 통증", () => {
   const all = [e("a", 3, 2), e("b", 4, 5), e("a", 2, 4)];
 
   it("한 운동의 기록만 시간 순서로 고른다", () => {
     expect(entriesFor(all, "a").map((x) => x.pain)).toEqual([3, 2]);
   });
 
-  it("가장 최근 운동 전 통증을 돌려주고, 기록이 없으면 null", () => {
-    expect(lastPainBefore(all, "a")).toBe(4);
-    expect(lastPainBefore(all, "b")).toBe(5);
-    expect(lastPainBefore(all, "zzz")).toBeNull();
+  it("가장 최근 운동 후 통증을 돌려주고, 기록이 없으면 null", () => {
+    expect(lastPainAfter(all, "a")).toBe(2);
+    expect(lastPainAfter(all, "b")).toBe(4);
+    expect(lastPainAfter(all, "zzz")).toBeNull();
   });
 
-  it("운동 전 통증이 없는 옛 기록은 건너뛰고 그 이전 값을 쓴다", () => {
-    const old = [e("a", 3, 6), e("a", 2)];
-    expect(lastPainBefore(old, "a")).toBe(6);
+  it("운동 전 통증이 없는 옛 기록이어도 운동 후 통증으로 비교할 수 있다", () => {
+    expect(lastPainAfter([e("a", 3), e("a", 5)], "a")).toBe(5);
   });
 
   it("운동 전 통증이 없는 옛 기록도 읽을 수 있고, 범위 밖 값은 버린다", () => {

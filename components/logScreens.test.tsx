@@ -60,10 +60,10 @@ describe("운동별 기록 화면", () => {
 });
 
 describe("기록 카드", () => {
-  it("처음에는 운동 전·후 통증 슬라이더가 둘 다 보이고 한 번만 입력하면 된다고 알려 준다", () => {
+  it("추천을 거치지 않은 첫 기록이면 운동 전·후 통증 슬라이더가 둘 다 보인다", () => {
     const html = renderToStaticMarkup(<RecordCard exerciseId={EXERCISES[0].id} />);
     expect((html.match(/type="range"/g) ?? []).length).toBe(2);
-    expect(html).toContain("처음 한 번만 입력하면");
+    expect(html).toContain("추천을 거치지 않고 처음 기록하는 운동");
     expect(html).toContain(`/log/${EXERCISES[0].id}`);
   });
 });

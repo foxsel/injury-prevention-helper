@@ -93,10 +93,14 @@ export function entriesFor(entries: LogEntry[], exerciseId: string): LogEntry[] 
   return entries.filter((e) => e.exerciseId === exerciseId).sort((a, b) => a.at - b.at);
 }
 
-/** 이 운동에서 가장 최근에 기록한 "운동 전 통증". 없으면 null. (다음 기록에서 입력을 건너뛰는 데 쓴다) */
-export function lastPainBefore(entries: LogEntry[], exerciseId: string): number | null {
-  const list = entriesFor(entries, exerciseId).filter((e) => e.painBefore !== undefined);
-  return list.length > 0 ? (list[list.length - 1].painBefore as number) : null;
+/**
+ * 이 운동에서 가장 최근에 기록한 "운동 후 통증". 없으면 null.
+ * 다음 운동 전 통증은 보통 지난 운동이 끝난 때의 통증과 같으므로, 기록 카드가 이 값과 비교해서
+ * 같으면 운동 전 통증 입력을 건너뛰게 한다.
+ */
+export function lastPainAfter(entries: LogEntry[], exerciseId: string): number | null {
+  const list = entriesFor(entries, exerciseId);
+  return list.length > 0 ? list[list.length - 1].pain : null;
 }
 
 /** 통증을 이 점수로 기록했을 때 운동 중단과 상담을 안내해야 하는지 (추천 기준과 같은 6점) */

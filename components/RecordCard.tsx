@@ -1,16 +1,19 @@
 "use client";
 
 // Design Ref: PRD nice "진행 기록 화면" — 가이드 화면 아래에서 오늘 운동을 마쳤다고 기록한다.
-// Plan SC: 운동 전·후 통증을 남긴다. 운동 전 통증은 처음 한 번만 입력하고, 같은 운동은 지난번 값을 그대로 쓰거나 새로 입력한다.
+// Plan SC: 운동 전 통증을 같은 내용으로 두 번 묻지 않는다.
+//          · 추천받고 넘어왔다면 추천 때 입력한 통증을 운동 전 통증으로 미리 넣어 둔다.
+//          · 그 뒤 기록부터는 지난 운동 후 통증과 같으면 입력을 건너뛰고, 달라졌을 때만 새로 입력한다.
 //          통증을 6점 이상으로 기록하면 운동 중단과 전문가 상담을 안내한다. 기록은 브라우저에만 저장된다.
 
 import Link from "next/link";
 import { useState } from "react";
 import { PAIN_MAX, PAIN_MIN } from "../lib/constants";
-import { addEntry, lastPainBefore, makeEntry, shouldAdviseStop } from "../lib/log";
+import { addEntry, lastPainAfter, makeEntry, shouldAdviseStop } from "../lib/log";
 import { LOG_MESSAGES } from "../lib/notices";
 import { Card } from "./Card";
 import { Choice } from "./Choice";
+import { consumeIntakePain, useIntakePain } from "./intakePainStore";
 import { saveLog, useLog } from "./logStore";
 
 type Saved = { advise: boolean; ok: boolean } | null;
@@ -48,21 +51,25 @@ function PainSlider({
 
 export function RecordCard({ exerciseId }: { exerciseId: string }) {
   const entries = useLog();
-  // 이 운동에서 지난번에 기록한 "운동 전 통증". 있으면 입력을 건너뛸 수 있다.
-  const last = lastPainBefore(entries, exerciseId);
+  // 추천받을 때 입력한 통증(있으면 첫 기록의 운동 전 통증으로 쓴다)
+  const intake = useIntakePain(exerciseId);
+  // 지난번 운동 후 통증(두 번째 기록부터 운동 전 통증과 비교한다)
+  const last = lastPainAfter(entries, exerciseId);
+  // 운동 전 통증으로 미리 넣어 둘 값. 둘 다 없으면 직접 입력한다.
+  const reference = intake ?? last;
 
   const [mode, setMode] = useState<"same" | "change">("same");
   const [before, setBefore] = useState(0);
   const [pain, setPain] = useState(0);
   const [saved, setSaved] = useState<Saved>(null);
 
-  const useSame = last !== null && mode === "same";
-  const painBefore = useSame ? last : before;
+  const painBefore = reference !== null && mode === "same" ? reference : before;
 
   function record() {
     const ok = saveLog(addEntry(entries, makeEntry(exerciseId, painBefore, pain, new Date())));
     setSaved({ ok, advise: shouldAdviseStop(painBefore) || shouldAdviseStop(pain) });
-    // 방금 입력한 값이 다음 기록의 "지난번 값"이 되므로, 다음에는 다시 "같아요"부터 시작한다.
+    // 추천 때 입력한 통증은 한 번 쓰면 지운다. 다음 기록은 방금 남긴 운동 후 통증과 비교한다.
+    consumeIntakePain(exerciseId);
     setMode("same");
   }
 
@@ -75,10 +82,9 @@ export function RecordCard({ exerciseId }: { exerciseId: string }) {
         </p>
       </div>
 
-      {/* 운동 전 통증: 처음 한 번만 입력하고, 그다음부터는 지난번 값을 그대로 쓸 수 있다. */}
       <fieldset className="flex flex-col gap-3">
         <legend className="text-sm font-medium">운동 전 통증</legend>
-        {last === null ? (
+        {reference === null ? (
           <>
             <PainSlider
               id="record-before"
@@ -90,7 +96,8 @@ export function RecordCard({ exerciseId }: { exerciseId: string }) {
               }}
             />
             <p className="text-xs leading-5 text-muted">
-              처음 한 번만 입력하면, 다음부터 이 운동은 입력을 건너뛸 수 있어요.
+              추천을 거치지 않고 처음 기록하는 운동이에요. 한 번 입력하면, 다음부터는 지난 운동 후
+              통증과 같은지만 확인해요.
             </p>
           </>
         ) : (
@@ -105,7 +112,9 @@ export function RecordCard({ exerciseId }: { exerciseId: string }) {
                   setSaved(null);
                 }}
               >
-                지난번과 같아요 ({last}점)
+                {intake !== null
+                  ? `추천받을 때 입력한 ${intake}점 그대로`
+                  : `지난 운동 후 통증과 같아요 (${last}점)`}
               </Choice>
               <Choice
                 type="radio"
@@ -113,7 +122,7 @@ export function RecordCard({ exerciseId }: { exerciseId: string }) {
                 checked={mode === "change"}
                 onChange={() => {
                   setMode("change");
-                  setBefore(last);
+                  setBefore(reference);
                   setSaved(null);
                 }}
               >

@@ -14,9 +14,11 @@ import { improvingExerciseIds, parseLog, LOG_KEY } from "../lib/log";
 import { judgeSafety } from "../lib/safety";
 import { consumeStart, START_EVENT } from "../lib/startSignal";
 import type { RecommendRequest, ValidationIssue } from "../lib/validate";
+import { buildIntakePainMap } from "../lib/intakePain";
 import { DetailsStep } from "./DetailsStep";
 import { DotHands } from "./DotHands";
 import { HeroStep } from "./HeroStep";
+import { clearIntakePain, saveIntakePain } from "./intakePainStore";
 import { ResultList, type ResultView } from "./ResultList";
 import { TypeStep } from "./TypeStep";
 
@@ -64,6 +66,7 @@ export function Flow() {
     setIssues([]);
     setResult(null);
     setPending(false);
+    clearIntakePain();
   }
 
   // [처음으로] 신호: 이 화면이 보이는 중이면 이벤트로 받고, 다른 화면에서 돌아왔을 때는 표시로 확인한다.
@@ -176,7 +179,10 @@ export function Flow() {
         body: JSON.stringify(request),
       });
       const data = (await response.json()) as RecommendResponse;
-      setResult(data.status === "ok" ? withBoost(data, request) : data);
+      const view = data.status === "ok" ? withBoost(data, request) : data;
+      // 추천받을 때 입력한 통증은 첫 기록의 운동 전 통증으로 넘겨, 같은 통증을 다시 묻지 않는다.
+      saveIntakePain(view.status === "ok" ? buildIntakePainMap(view.exercises, request.parts) : {});
+      setResult(view);
     } catch {
       setResult({ status: "network-error" });
     } finally {

@@ -59,6 +59,8 @@
 | `/log` | 진행 기록 (nice) | 운동 완료와 운동 후 통증을 날짜별로 보여 줌. 기록은 이 브라우저(localStorage)에만 저장하고 서버로 보내지 않음. 통증 6점 이상이면 중단·상담 안내 |
 | `/log/[id]` | 운동별 기록 (nice) | 한 운동의 운동 전·후 통증 그래프와 분석. 3번 연속 높아지거나 6점 이상이면 병원 진료 제안, 2번 연속 낮아지면 다음 추천에서 앞쪽에 더 보여 줌 |
 
+**운동 전 통증을 묻는 방식 (같은 통증을 두 번 묻지 않기)**: 추천받을 때 입력한 부위별 통증은 이 탭(sessionStorage)에 운동별로 잠깐 두고, 가이드의 기록 카드가 첫 기록의 운동 전 통증으로 미리 넣어 준다(운동이 다루는 부위 중 고른 부위의 가장 높은 값). 두 번째 기록부터는 지난 운동 후 통증과 같으면 입력을 건너뛰고, 달라졌을 때만 새로 입력한다. 추천 없이 처음 기록하는 운동만 직접 입력한다. [처음으로]를 누르면 잠깐 둔 값을 모두 지운다.
+
 ### 3.0 화면 흐름 (v0.4에서 바뀜)
 
 `/` 한 주소 안에서 세 화면이 차례로 바뀐다. 화면이 바뀔 때는 나가는 화면이 사라진 뒤 들어오는 화면이 아래에서 올라오고, 배경의 점으로 그린 손도 함께 움직인다(손은 첫 화면에서 가장 크게 보이고, 유형 화면에서는 아래로 내려가며, 입력 화면에서는 사라진다).
@@ -355,7 +357,7 @@ my-app/
 | 11 | 예외 화면 | `components/Notice.tsx` |
 | 12 | 점검 | — |
 | 13 | Vercel 배포 | Vercel 환경변수 |
-| 14 | (nice) 진행 기록 | `app/log/page.tsx`, `app/log/[id]/page.tsx`, `components/LogView.tsx`, `components/ExerciseLogView.tsx`, `components/PainChart.tsx`, `components/RecordCard.tsx`, `components/logStore.ts`, `lib/log.ts`, `lib/boost.ts` |
+| 14 | (nice) 진행 기록 | `app/log/page.tsx`, `app/log/[id]/page.tsx`, `components/LogView.tsx`, `components/ExerciseLogView.tsx`, `components/PainChart.tsx`, `components/RecordCard.tsx`, `components/logStore.ts`, `components/intakePainStore.ts`, `lib/log.ts`, `lib/boost.ts`, `lib/intakePain.ts` |
 
 ### 12.2 구현할 때 주의
 
