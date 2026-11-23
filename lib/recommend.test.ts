@@ -10,8 +10,7 @@ function body(overrides: Record<string, unknown> = {}): string {
   return JSON.stringify({
     userType: "예방형",
     sport: "축구",
-    parts: [{ part: "무릎", pain: 1 }],
-    cannotBearWeight: false,
+    parts: [{ part: "어깨", pain: 1 }],
     ...overrides,
   });
 }
@@ -28,13 +27,12 @@ describe("getCandidates", () => {
     const candidates = getCandidates({
       userType: "예방형",
       sport: "농구",
-      parts: [{ part: "무릎", pain: 1 }],
-      cannotBearWeight: false,
+      parts: [{ part: "어깨", pain: 1 }],
     });
     expect(candidates.length).toBeGreaterThan(0);
     for (const exercise of candidates) {
       expect(exercise.purpose).toBe("예방");
-      expect(exercise.bodyParts).toContain("무릎");
+      expect(exercise.bodyParts).toContain("어깨");
       expect(exercise.sports).toContain("농구");
     }
   });
@@ -57,21 +55,12 @@ describe("getCandidates", () => {
       sport: "축구",
       parts: [
         { part: "발목", pain: 1 },
-        { part: "무릎", pain: 1 },
+        { part: "어깨", pain: 1 },
       ],
       cannotBearWeight: false,
     });
     expect(candidates.some((e) => e.bodyParts.includes("발목"))).toBe(true);
-    expect(candidates.some((e) => e.bodyParts.includes("무릎"))).toBe(true);
-  });
-
-  it("근거 자료가 없어 비워 둔 어깨 예방은 후보가 없다(가상 샘플을 내보내지 않는다)", () => {
-    const candidates = getCandidates({
-      userType: "예방형",
-      sport: "야구",
-      parts: [{ part: "어깨", pain: 1 }],
-    });
-    expect(candidates).toEqual([]);
+    expect(candidates.some((e) => e.bodyParts.includes("어깨"))).toBe(true);
   });
 });
 
@@ -160,7 +149,7 @@ describe("handleRecommend: 정상 흐름", () => {
     await handleRecommend(body({ sport: "야구" }), ai);
     const [request, candidates] = vi.mocked(ai).mock.calls[0];
     expect(request.sport).toBe("야구");
-    expect(candidates.every((e) => e.bodyParts.includes("무릎"))).toBe(true);
+    expect(candidates.every((e) => e.bodyParts.includes("어깨"))).toBe(true);
     expect(candidates.every((e) => e.purpose === "예방")).toBe(true);
   });
 

@@ -10,7 +10,7 @@
 // - 발목 회복 운동 4개 (모든 지원 종목 공통)  ← AAFP 발목 염좌 환자 안내
 // - 발목·무릎 예방 운동 6개 (모든 지원 종목 공통) ← FIFA 11+ 부상 예방 소책자
 // - 무릎 회복 운동 3개, 어깨 회복 운동 4개 (모든 지원 종목 공통) ← 분당서울대병원 수술 후 운동교육
-// - 어깨 예방 운동: 근거 자료를 찾지 못해 현재 없음(가상 샘플 4개는 만들어 두었지만 내보내지 않는다)
+// - 어깨 예방 운동 4개 (모든 지원 종목 공통) ← ⚠ 근거 자료 없는 가상 샘플 데이터
 //
 // ⚠ 가상 샘플 데이터 (source가 SAMPLE_SOURCE인 운동)
 //   근거 자료를 찾지 못해 실습용으로 임의로 만든 데이터다. 횟수·세트도 임의 값이다.
@@ -80,7 +80,7 @@ export const SAMPLE_SOURCE = "가상 샘플 데이터(근거 자료 없음, 실�
 const SAMPLE_CAUTION =
   "이 운동은 근거 자료 없이 실습용으로 만든 가상 샘플이다. 실제 서비스 전에 근거 자료와 전문가 검토로 바꿔야 한다.";
 
-const SOURCED_EXERCISES: Exercise[] = [
+export const EXERCISES: Exercise[] = [
   // ── 발목 회복 (AAFP) ─────────────────────────────────────────
   {
     id: "ankle-pump-circle-01",
@@ -501,12 +501,7 @@ const SOURCED_EXERCISES: Exercise[] = [
     source: SNUBH_SHOULDER,
   },
 
-];
-
-// ── 어깨 예방 (가상 샘플 데이터) ─────────────────────────────
-// 아래 4개는 근거 자료가 없어 화면에 내보내지 않는다(EXERCISES에 넣지 않음).
-// 출처 있는 어깨 예방 운동으로 교체할 때 이 배열을 대체하거나 지운다.
-const SAMPLE_EXERCISES: Exercise[] = [
+  // ── 어깨 예방 (가상 샘플 데이터) ─────────────────────────────
   {
     id: "shoulder-sample-scapular-squeeze-01",
     highImpact: false,
@@ -591,12 +586,3 @@ const SAMPLE_EXERCISES: Exercise[] = [
     source: SAMPLE_SOURCE,
   },
 ];
-
-/**
- * 화면과 추천에 쓰는 운동 목록. 근거 자료가 확인된 운동만 들어 있다.
- * (가상 샘플은 제외 — 어깨 예방 운동은 근거 자료를 찾기 전까지 비어 있다.)
- */
-export const EXERCISES: Exercise[] = SOURCED_EXERCISES;
-
-/** 아직 내보내지 않는 가상 샘플 운동(시험에서 목록에 섞이지 않았는지 확인할 때 쓴다) */
-export const UNUSED_SAMPLE_EXERCISES: readonly Exercise[] = SAMPLE_EXERCISES;
