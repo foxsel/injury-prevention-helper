@@ -3,7 +3,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { EXERCISES } from "../lib/exercises/data";
 import { BLOCK_MESSAGES, NOTICE_NOT_MEDICAL, NOTICE_PROTOTYPE, RESULT_MESSAGES } from "../lib/notices";
-import { cardOffset, commonStopCriteria } from "./ExerciseCarousel";
+import { commonStopCriteria, rel, virtualCount } from "./ExerciseCarousel";
 import { ResultList } from "./ResultList";
 
 const render = (result: Parameters<typeof ResultList>[0]["result"]) =>
@@ -33,11 +33,21 @@ describe("추천 결과 화면(카드 한 줄)", () => {
   });
 });
 
-describe("카드 돌리기 계산", () => {
-  it("가운데 카드는 0, 양옆은 -1·1이고 끝에서 이어진다", () => {
-    expect([0, 1, 2, 3].map((i) => cardOffset(i, 0, 4))).toEqual([0, 1, -2, -1]);
-    expect([0, 1, 2, 3].map((i) => cardOffset(i, 3, 4))).toEqual([1, -2, -1, 0]);
-    expect(cardOffset(0, 0, 1)).toBe(0);
+describe("선반 돌리기 계산", () => {
+  it("가운데는 0이고 양옆은 -1·1이며 끝에서 이어진다", () => {
+    expect(rel(0, 0, 24)).toBe(0);
+    expect(rel(1, 0, 24)).toBe(1);
+    expect(rel(23, 0, 24)).toBe(-1);
+    expect(rel(12, 0, 24)).toBe(-12);
+    expect(rel(0, 23, 24)).toBe(1);
+  });
+
+  it("가상 테이프 수는 운동 수의 배수이고 선반을 채울 만큼 많다", () => {
+    for (const n of [1, 2, 3, 4, 5]) {
+      const v = virtualCount(n);
+      expect(v % n).toBe(0);
+      expect(v).toBeGreaterThanOrEqual(24);
+    }
   });
 });
 
