@@ -10,6 +10,7 @@ import { MAX_REQUEST_BYTES } from "./constants";
 import { EXERCISES } from "./exercises/data";
 import type { Exercise } from "./exercises/types";
 import { filterBySafety, judgeSafety, type BlockReason } from "./safety";
+import { sortBySportFocus } from "./sportFocus";
 import {
   validateRecommendRequest,
   type RecommendRequest,
@@ -117,5 +118,9 @@ export async function handleRecommend(
     return { httpStatus: 502, body: { status: "error", code: "AI_FAILED" } };
   }
 
-  return { httpStatus: 200, body: { status: "ok", exercises } };
+  // ⑧ 종목의 주요 부위 운동을 앞에 둔다(순서만 바꾸고 내용·개수는 그대로).
+  return {
+    httpStatus: 200,
+    body: { status: "ok", exercises: sortBySportFocus(exercises, request.sport) },
+  };
 }

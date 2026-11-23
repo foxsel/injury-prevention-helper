@@ -10,6 +10,7 @@ import {
   type BodyPart,
 } from "../lib/constants";
 import { orderedParts, shouldAskWeight, type IntakeState } from "../lib/intake";
+import { focusHint } from "../lib/sportFocus";
 import type { ValidationIssue } from "../lib/validate";
 import { Card } from "./Card";
 import { Choice } from "./Choice";
@@ -114,7 +115,11 @@ export function DetailsStep({
             </Question>
           ) : null}
 
-          <Question id="sport" title="어떤 운동을 하나요?">
+          <Question
+            id="sport"
+            title="어떤 운동을 하나요?"
+            help={intake.sport ? focusHint(intake.sport) : undefined}
+          >
             {SPORTS.map((sport) => (
               <Choice
                 key={sport}

@@ -3,7 +3,9 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
+import type { Sport } from "../lib/constants";
 import type { Exercise } from "../lib/exercises/types";
+import { isSportFocus } from "../lib/sportFocus";
 import {
   BLOCK_MESSAGES,
   NOTICE_NOT_MEDICAL,
@@ -17,7 +19,8 @@ import type { RecommendResponse } from "../lib/recommend";
 export type ResultView =
   | Exclude<RecommendResponse, { status: "ok" }>
   // boosted: 진행 기록에서 통증이 줄고 있어 앞쪽으로 올라온 운동의 번호
-  | { status: "ok"; exercises: Exercise[]; boosted?: string[] }
+  // sport: 고른 종목(주요 부위 표시용)
+  | { status: "ok"; exercises: Exercise[]; boosted?: string[]; sport?: Sport }
   | { status: "network-error" };
 
 /** 추천된 모든 운동에 똑같이 들어 있는 중단 기준(한 번만 보여 준다) */
@@ -31,11 +34,13 @@ function ExerciseCard({
   index,
   common,
   boosted,
+  focusSport,
 }: {
   exercise: Exercise;
   index: number;
   common: string[];
   boosted: boolean;
+  focusSport?: Sport;
 }) {
   const extraStops = exercise.stopCriteria.filter((c) => !common.includes(c));
   return (
@@ -51,6 +56,11 @@ function ExerciseCard({
           {boosted ? (
             <p className="mb-1 inline-block rounded-full bg-accent px-2.5 py-0.5 text-[11px] font-semibold text-on-accent">
               {TREND_MESSAGES.boosted}
+            </p>
+          ) : null}
+          {focusSport && isSportFocus(exercise, focusSport) ? (
+            <p className="mb-1 ml-1 inline-block rounded-full bg-notice-bg px-2.5 py-0.5 text-[11px] font-semibold">
+              {focusSport}에서 부담이 많이 가는 부위
             </p>
           ) : null}
           <h4 className="text-lg font-semibold leading-7">{exercise.name}</h4>
@@ -145,6 +155,7 @@ export function ResultList({
               index={i}
               common={common}
               boosted={result.boosted?.includes(exercise.id) ?? false}
+              focusSport={result.sport}
             />
           ))}
         </ul>
