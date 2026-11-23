@@ -244,7 +244,8 @@ describe("좋아지는 운동을 추천 앞쪽에 올리기", () => {
   const request: RecommendRequest = {
     userType: "예방형",
     sport: "농구",
-    parts: [{ part: "어깨", pain: 1 }],
+    parts: [{ part: "무릎", pain: 1 }],
+    cannotBearWeight: false,
   };
   const candidates = safeCandidates(request);
 
