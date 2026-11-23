@@ -94,45 +94,75 @@ describe("통증 변화 분석", () => {
   });
 });
 
-describe("2점 이상 줄었을 때 효과 분석", () => {
+describe("처음 운동 전 통증과 최근 운동 후 통증 비교(효과 분석)", () => {
+  /** [운동 전, 운동 후] 쌍으로 기록을 만든다. */
+  const pairs = (...p: [number, number][]) => p.map(([b, a]) => e("x", a, b));
+
   it("기준은 2점이다", () => {
     expect(EFFECT_DROP_POINTS).toBe(2);
   });
 
-  it("통증이 낮아지는 흐름에서 합쳐서 2점 이상 줄면 효과 문구 대상이다", () => {
-    const t = analyzeTrend(series(5, 4, 3));
-    expect(t.status).toBe("improving");
+  it("처음 운동 전 통증보다 최근 운동 후 통증이 2점 낮으면 효과 문구 대상이다", () => {
+    const t = analyzeTrend(pairs([5, 4], [4, 3]));
     expect([t.dropFrom, t.dropTo, t.drop, t.effective]).toEqual([5, 3, 2, true]);
   });
 
-  it("한 번에 2점 이상 줄어도 대상이다(5점 → 3점)", () => {
-    const t = analyzeTrend(series(5, 3));
-    expect(t.status).toBe("steady");
+  it("기록이 한 번뿐이어도 운동 전 5점에서 운동 후 3점이면 대상이다", () => {
+    expect(analyzeTrend(pairs([5, 3])).effective).toBe(true);
+  });
+
+  it("운동 후 점수끼리 비교하지 않는다: 운동 후 4점 → 3점(1점 차이)이어도 처음 운동 전이 5점이면 대상이다", () => {
+    const t = analyzeTrend(pairs([5, 4], [4, 3]));
     expect(t.effective).toBe(true);
-    expect(t.drop).toBe(2);
+    // 반대로 운동 후 점수끼리는 5점 → 3점으로 2점 줄었어도, 처음 운동 전 통증이 4점이면 1점 차이라 대상이 아니다.
+    expect(analyzeTrend(pairs([4, 5], [5, 3])).effective).toBe(false);
   });
 
-  it("1점만 줄면 대상이 아니다", () => {
-    expect(analyzeTrend(series(4, 3)).effective).toBe(false);
-    expect(analyzeTrend(series(3, 4, 3)).effective).toBe(false);
+  it("2점보다 적게 낮으면 대상이 아니다", () => {
+    expect(analyzeTrend(pairs([4, 3])).effective).toBe(false);
+    expect(analyzeTrend(pairs([3, 3], [3, 3])).effective).toBe(false);
   });
 
-  it("줄다가 다시 높아졌거나 변화가 없으면 대상이 아니다", () => {
-    expect(analyzeTrend(series(5, 3, 4)).effective).toBe(false);
-    expect(analyzeTrend(series(3, 3, 3)).effective).toBe(false);
+  it("비교의 시작은 가장 처음 입력한 운동 전 통증이다(중간에 운동 전 통증이 바뀌어도 처음 값을 쓴다)", () => {
+    const t = analyzeTrend(pairs([6, 5], [2, 3], [3, 2]));
+    expect(t.dropFrom).toBe(6);
+    expect(t.dropTo).toBe(2);
+    expect(t.effective).toBe(true);
+  });
+
+  it("운동 전 통증이 없는 옛 기록은 건너뛰고 처음으로 운동 전 통증이 있는 기록을 쓴다", () => {
+    const list = [e("x", 5), ...pairs([5, 4], [4, 2])];
+    expect(analyzeTrend(list).dropFrom).toBe(5);
+    expect(analyzeTrend(list).effective).toBe(true);
+  });
+
+  it("운동 전 통증이 하나도 없으면 비교할 수 없어 대상이 아니다", () => {
+    const t = analyzeTrend([e("x", 5), e("x", 2)]);
+    expect(t.effective).toBe(false);
+    expect(t.drop).toBe(0);
+  });
+
+  it("기록이 없으면 대상이 아니다", () => {
     expect(analyzeTrend([]).effective).toBe(false);
-    expect(analyzeTrend(series(3)).effective).toBe(false);
   });
 
-  it("줄었어도 가장 최근 통증이 6점 이상이면 병원 상담이 먼저라 대상이 아니다", () => {
-    const t = analyzeTrend(series(9, 7));
+  it("최근 통증이 6점 이상이면 병원 상담이 먼저라 대상이 아니다", () => {
+    const t = analyzeTrend(pairs([9, 8], [8, 6]));
     expect(t.status).toBe("consult");
     expect(t.effective).toBe(false);
   });
 
-  it("문구에 줄어든 점수가 들어 있고 효과를 보장하는 표현이 없다", () => {
+  it("지금 통증이 높아지는 중이면 대상이 아니다", () => {
+    const t = analyzeTrend(pairs([7, 3], [3, 4], [4, 5]));
+    expect(t.status).toBe("rising");
+    expect(t.effective).toBe(false);
+  });
+
+  it("문구에 비교한 두 점수와 줄어든 점수가 들어 있고 효과를 보장하는 표현이 없다", () => {
     const text = effectMessage(5, 3);
-    expect(text).toContain("5점에서 3점으로 2점 줄었어요");
+    expect(text).toContain("운동 전 통증 5점");
+    expect(text).toContain("운동 후 통증 3점");
+    expect(text).toContain("2점 줄었어요");
     expect(text).toContain("효과를 보이는");
     for (const term of FORBIDDEN_TERMS) expect(text).not.toContain(term);
   });

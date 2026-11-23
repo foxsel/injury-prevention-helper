@@ -150,7 +150,7 @@ export const RISING_CONSULT_COUNT = 3;
 /** 통증이 연속으로 이만큼 낮아지면 이 운동을 추천에서 더 앞에 보여 준다. */
 export const FALLING_IMPROVE_COUNT = 2;
 
-/** 통증이 한 번이라도 이어서 낮아져 합쳐서 이만큼(점) 이상 줄면 "효과를 보이는 흐름"이라고 알려 준다. */
+/** 가장 처음 입력한 운동 전 통증보다 가장 최근 운동 후 통증이 이만큼(점) 이상 낮으면 "효과를 보이는 흐름"이라고 알려 준다. */
 export const EFFECT_DROP_POINTS = 2;
 
 export interface Trend {
@@ -161,13 +161,13 @@ export interface Trend {
   risingCount: number;
   /** 가장 최근 기록 기준으로 통증이 연속해서 낮아진 횟수 */
   fallingCount: number;
-  /** 낮아지기 시작하기 직전의 운동 후 통증(낮아진 적이 없으면 가장 최근 값) */
+  /** 비교의 시작: 가장 처음 입력한 운동 전 통증(운동 전 통증이 있는 기록이 없으면 dropTo와 같다) */
   dropFrom: number;
-  /** 가장 최근 운동 후 통증(기록이 없으면 0) */
+  /** 비교의 끝: 가장 최근 운동 후 통증(기록이 없으면 0) */
   dropTo: number;
   /** 낮아진 점수 = dropFrom - dropTo */
   drop: number;
-  /** 통증이 EFFECT_DROP_POINTS점 이상 줄었고 병원 상담 대상이 아니면 true → "효과를 보이는 흐름" 문구를 보여 준다. */
+  /** 처음 운동 전 통증보다 EFFECT_DROP_POINTS점 이상 낮고, 병원 상담 대상이 아니며 지금 통증이 높아지는 중이 아니면 true → "효과를 보이는 흐름" 문구를 보여 준다. */
   effective: boolean;
 }
 
@@ -182,16 +182,21 @@ export interface Trend {
  */
 export function analyzeTrend(entriesOfOneExercise: LogEntry[]): Trend {
   const trend = classifyTrend(entriesOfOneExercise);
-  const pains = [...entriesOfOneExercise].sort((a, b) => a.at - b.at).map((e) => e.pain);
-  const dropTo = pains.length > 0 ? pains[pains.length - 1] : 0;
-  const dropFrom = pains.length > 0 ? pains[pains.length - 1 - trend.fallingCount] : 0;
+  const list = [...entriesOfOneExercise].sort((a, b) => a.at - b.at);
+  const firstBefore = list.find((e) => e.painBefore !== undefined)?.painBefore;
+  const dropTo = list.length > 0 ? list[list.length - 1].pain : 0;
+  const dropFrom = firstBefore ?? dropTo;
   const drop = dropFrom - dropTo;
   return {
     ...trend,
     dropFrom,
     dropTo,
     drop,
-    effective: trend.status !== "consult" && trend.fallingCount >= 1 && drop >= EFFECT_DROP_POINTS,
+    effective:
+      firstBefore !== undefined &&
+      trend.status !== "consult" &&
+      trend.status !== "rising" &&
+      drop >= EFFECT_DROP_POINTS,
   };
 }
 
