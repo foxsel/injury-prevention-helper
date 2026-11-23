@@ -1,69 +1,45 @@
-import Image from "next/image";
+// Design Ref: §3.1 `/` 첫 화면 — 서비스 소개와 AI 전송 안내.
+// 입력 영역과 결과 영역은 PLAN 7번 이후에 이 화면에 이어서 붙인다.
+
+import { AiTransmissionNotice } from "../components/Disclaimer";
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <main className="mx-auto flex w-full max-w-3xl flex-col gap-8 px-4 py-8">
+      <section aria-labelledby="intro-heading" className="flex flex-col gap-3">
+        <h1 id="intro-heading" className="text-2xl font-bold leading-snug">
+          내 상태에 맞는 부상 예방·회복 운동을 찾아보세요
+        </h1>
+        <p className="leading-7 text-zinc-700 dark:text-zinc-300">
+          종목과 아픈 부위, 통증 정도를 알려 주시면 미리 정리해 둔 예방·회복 운동
+          중에서 알맞은 운동을 골라 방법과 주의사항을 함께 안내합니다. 로그인 없이
+          바로 사용할 수 있습니다.
+        </p>
+      </section>
+
+      <section aria-labelledby="how-heading" className="flex flex-col gap-3">
+        <h2 id="how-heading" className="text-lg font-semibold">
+          이렇게 사용해요
+        </h2>
+        <ol className="flex list-decimal flex-col gap-2 pl-6 leading-7 text-zinc-700 dark:text-zinc-300">
+          <li>예방형(아직 다치지 않았어요)인지 회복형(치료 후 회복 중이에요)인지 고릅니다.</li>
+          <li>종목과 부위를 고르고, 부위마다 통증이 어느 정도인지 알려 줍니다.</li>
+          <li>추천된 운동을 확인하고, 운동마다 방법과 주의사항, 중단 기준을 살펴봅니다.</li>
+        </ol>
+      </section>
+
+      <section aria-labelledby="safety-heading" className="flex flex-col gap-3">
+        <h2 id="safety-heading" className="text-lg font-semibold">
+          안전하게 이용하려면
+        </h2>
+        <ul className="flex list-disc flex-col gap-2 pl-6 leading-7 text-zinc-700 dark:text-zinc-300">
+          <li>통증이 높거나 발을 딛기 어려울 때는 운동 대신 전문가(병원) 상담을 권합니다.</li>
+          <li>운동 중 통증이 6점 이상이거나 운동 전보다 심해지면 즉시 멈추세요.</li>
+          <li>이 서비스는 병명을 알려 주거나 치료를 대신하지 않는 참고용 안내입니다.</li>
+        </ul>
+      </section>
+
+      <AiTransmissionNotice />
+    </main>
   );
 }
