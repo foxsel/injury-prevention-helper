@@ -83,7 +83,7 @@ export function RecordCard({ exerciseId }: { exerciseId: string }) {
       </div>
 
       <fieldset className="flex flex-col gap-3">
-        <legend className="text-sm font-medium">운동 전 통증</legend>
+        <legend className="mb-3 text-sm font-medium">운동 전 통증</legend>
         {reference === null ? (
           <>
             <PainSlider
