@@ -2,7 +2,7 @@
 // Plan SC: 모든 운동에 방법·횟수·세트·주의사항·중단 기준이 함께 보이고, 공통 안내 2종이 결과 아래에도 보인다.
 
 import type { ReactNode } from "react";
-import type { Exercise } from "../lib/exercises/types";
+import { ExerciseCarousel } from "./ExerciseCarousel";
 import {
   BLOCK_MESSAGES,
   NOTICE_NOT_MEDICAL,
@@ -14,103 +14,16 @@ import type { RecommendResponse } from "../lib/recommend";
 /** 서버가 보낸 결과 + 서버에 닿지 못한 경우 */
 export type ResultView = RecommendResponse | { status: "network-error" };
 
-/** 추천된 모든 운동에 똑같이 들어 있는 중단 기준(한 번만 보여 준다) */
-export function commonStopCriteria(exercises: Exercise[]): string[] {
-  if (exercises.length === 0) return [];
-  return exercises[0].stopCriteria.filter((c) => exercises.every((e) => e.stopCriteria.includes(c)));
-}
-
-function ExerciseCard({
-  exercise,
-  index,
-  common,
-}: {
-  exercise: Exercise;
-  index: number;
-  common: string[];
-}) {
-  const extraStops = exercise.stopCriteria.filter((c) => !common.includes(c));
-  return (
-    <li className="rounded-3xl bg-surface p-5 ring-1 ring-line sm:p-6">
-      <div className="flex items-start gap-3">
-        <span
-          aria-hidden="true"
-          className="flex size-7 shrink-0 items-center justify-center rounded-full bg-accent text-sm font-semibold text-on-accent"
-        >
-          {index + 1}
-        </span>
-        <div className="min-w-0">
-          <h4 className="text-lg font-semibold leading-7">{exercise.name}</h4>
-          <p className="mt-1 text-sm leading-6 text-muted">{exercise.description}</p>
-        </div>
-      </div>
-
-      <p className="mt-4 flex flex-wrap gap-2 text-[13px] font-medium">
-        <span className="rounded-full bg-notice-bg px-3 py-1">{exercise.reps}</span>
-        <span className="rounded-full bg-notice-bg px-3 py-1">{exercise.sets}</span>
-      </p>
-
-      <div className="mt-4 border-t border-line pt-4">
-        <h5 className="text-sm font-semibold">하는 방법</h5>
-        <ol className="mt-1.5 flex list-decimal flex-col gap-1 pl-5 text-sm leading-6">
-          {exercise.steps.map((step) => (
-            <li key={step}>{step}</li>
-          ))}
-        </ol>
-      </div>
-
-      <div className="mt-4">
-        <h5 className="text-sm font-semibold">주의사항</h5>
-        <ul className="mt-1.5 flex list-disc flex-col gap-1 pl-5 text-sm leading-6">
-          {exercise.cautions.map((caution) => (
-            <li key={caution}>{caution}</li>
-          ))}
-        </ul>
-      </div>
-
-      {extraStops.length > 0 ? (
-        <div className="mt-4 rounded-2xl bg-notice-bg px-4 py-3 text-sm leading-6">
-          <h5 className="font-semibold">이 운동은 특히</h5>
-          <ul className="mt-1 flex list-disc flex-col gap-0.5 pl-5">
-            {extraStops.map((criterion) => (
-              <li key={criterion}>{criterion}</li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
-    </li>
-  );
-}
-
 function Message({ children }: { children: ReactNode }) {
   return <p className="rounded-3xl bg-surface p-5 leading-7 ring-1 ring-line">{children}</p>;
 }
 
 export function ResultList({ result, onBack }: { result: ResultView; onBack: () => void }) {
+  if (result.status === "ok") {
+    return <ExerciseCarousel exercises={result.exercises} onBack={onBack} />;
+  }
   let content: ReactNode;
-  const common = result.status === "ok" ? commonStopCriteria(result.exercises) : [];
   switch (result.status) {
-    case "ok":
-      content = (
-        <>
-        {common.length > 0 ? (
-          <div className="mb-4 rounded-3xl bg-notice-bg p-5 text-sm leading-6">
-            <h4 className="font-semibold">모든 운동 공통 · 이럴 땐 멈추세요</h4>
-            <ul className="mt-1.5 flex list-disc flex-col gap-1 pl-5">
-              {common.map((criterion) => (
-                <li key={criterion}>{criterion}</li>
-              ))}
-            </ul>
-          </div>
-        ) : null}
-        <ul className="flex flex-col gap-4">
-          {result.exercises.map((exercise, i) => (
-            <ExerciseCard key={exercise.id} exercise={exercise} index={i} common={common} />
-          ))}
-        </ul>
-        </>
-      );
-      break;
     case "blocked":
       content = <Message>{BLOCK_MESSAGES[result.reason]}</Message>;
       break;
@@ -149,7 +62,7 @@ export function ResultList({ result, onBack }: { result: ResultView; onBack: () 
           tabIndex={-1}
           className="text-center text-[clamp(28px,3.6vw,44px)] font-medium leading-[1.12] tracking-[-0.03em] outline-none"
         >
-          {result.status === "ok" ? "추천 운동" : "안내"}
+          안내
         </h2>
         <div role="status">{content}</div>
         <button
