@@ -4,7 +4,7 @@ import type { AiPicker } from "./ai";
 import { AiFailedError, AiTimeoutError } from "./aiErrors";
 import { MAX_RECOMMENDATIONS, MAX_REQUEST_BYTES } from "./constants";
 import { EXERCISES } from "./exercises/data";
-import { getCandidates, handleRecommend, pickByIds } from "./recommend";
+import { getCandidates, handleRecommend } from "./recommend";
 
 function body(overrides: Record<string, unknown> = {}): string {
   return JSON.stringify({
@@ -61,34 +61,6 @@ describe("getCandidates", () => {
     });
     expect(candidates.some((e) => e.bodyParts.includes("발목"))).toBe(true);
     expect(candidates.some((e) => e.bodyParts.includes("어깨"))).toBe(true);
-  });
-});
-
-describe("pickByIds", () => {
-  const candidates = EXERCISES.filter((e) => e.purpose === "예방");
-
-  it("AI가 정한 순서를 지킨다", () => {
-    const [a, b, c] = candidates;
-    expect(pickByIds([c.id, a.id, b.id], candidates).map((e) => e.id)).toEqual([
-      c.id,
-      a.id,
-      b.id,
-    ]);
-  });
-
-  it("후보에 없는 id와 중복 id는 버린다", () => {
-    const [a, b] = candidates;
-    const picked = pickByIds([a.id, "없는-운동", a.id, b.id], candidates);
-    expect(picked.map((e) => e.id)).toEqual([a.id, b.id]);
-  });
-
-  it("최대 개수를 넘으면 앞에서부터 잘라낸다", () => {
-    const picked = pickByIds(
-      candidates.map((e) => e.id),
-      candidates,
-    );
-    expect(candidates.length).toBeGreaterThan(MAX_RECOMMENDATIONS);
-    expect(picked).toHaveLength(MAX_RECOMMENDATIONS);
   });
 });
 

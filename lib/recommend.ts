@@ -6,7 +6,7 @@
 
 import { AiTimeoutError } from "./aiErrors";
 import type { AiPicker } from "./ai";
-import { MAX_RECOMMENDATIONS, MAX_REQUEST_BYTES } from "./constants";
+import { MAX_REQUEST_BYTES } from "./constants";
 import { EXERCISES } from "./exercises/data";
 import type { Exercise } from "./exercises/types";
 import { filterBySafety, judgeSafety, type BlockReason } from "./safety";
@@ -15,6 +15,7 @@ import {
   type RecommendRequest,
   type ValidationIssue,
 } from "./validate";
+import { verifyPicks } from "./verify";
 
 /** 추천 응답 (서버 → 브라우저). DESIGN 5번 */
 export type RecommendResponse =
@@ -40,28 +41,6 @@ export function getCandidates(request: RecommendRequest): Exercise[] {
       exercise.purpose === purpose &&
       exercise.bodyParts.some((part) => selectedParts.includes(part)),
   );
-}
-
-/**
- * AI가 고른 id를 후보 목록의 운동으로 바꾼다.
- * 후보에 없는 id와 중복 id는 버리고, AI가 정한 순서를 지키며 최대 5개까지만 남긴다.
- * (PLAN 5번에서 이 검증을 verify.ts로 옮기고 금지 표현 등 검사를 더한다.)
- */
-export function pickByIds(ids: string[], candidates: Exercise[]): Exercise[] {
-  const byId = new Map(candidates.map((exercise) => [exercise.id, exercise]));
-  const picked: Exercise[] = [];
-  const used = new Set<string>();
-  for (const id of ids) {
-    const exercise = byId.get(id);
-    if (exercise && !used.has(id)) {
-      picked.push(exercise);
-      used.add(id);
-    }
-    if (picked.length >= MAX_RECOMMENDATIONS) {
-      break;
-    }
-  }
-  return picked;
 }
 
 function invalid(message: string): RecommendOutcome {
@@ -131,10 +110,10 @@ export async function handleRecommend(
     return { httpStatus: 200, body: { status: "empty" } };
   }
 
-  // ⑦ 후보 안의 id만 남기고, 운동 내용은 우리 목록에서 꺼낸다.
-  const exercises = pickByIds(ids, candidates);
+  // ⑦ 응답 검증: 후보 안의 id만 남기고, 필수 정보·금지 표현을 검사한 운동만 목록에서 꺼낸다.
+  const exercises = verifyPicks(ids, candidates);
   if (exercises.length === 0) {
-    // AI가 고른 id가 전부 후보 밖이었다면 믿을 수 없는 응답이다.
+    // 고른 id가 전부 후보 밖이거나 검증을 통과하지 못했다면 믿을 수 없는 응답이다.
     return { httpStatus: 502, body: { status: "error", code: "AI_FAILED" } };
   }
 
