@@ -17,6 +17,12 @@ export function TopNav() {
         <span aria-hidden="true">⌂</span>
         처음으로
       </Link>
+      <Link
+        href="/log"
+        className="inline-flex h-9 items-center gap-1.5 rounded-full bg-surface/90 px-3.5 text-[13px] font-medium ring-1 ring-line backdrop-blur transition-colors hover:bg-surface"
+      >
+        기록
+      </Link>
       <InfoButton />
     </div>
   );

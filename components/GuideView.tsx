@@ -5,6 +5,7 @@ import type { Exercise } from "../lib/exercises/types";
 import { NOTICE_NOT_MEDICAL, NOTICE_PROTOTYPE } from "../lib/notices";
 import { BackButton } from "./BackButton";
 import { Card } from "./Card";
+import { RecordCard } from "./RecordCard";
 
 export function GuideView({ exercise }: { exercise: Exercise }) {
   return (
@@ -53,6 +54,8 @@ export function GuideView({ exercise }: { exercise: Exercise }) {
           </ul>
         </div>
       </Card>
+
+      <RecordCard exerciseId={exercise.id} />
 
       <p className="mt-6 text-center text-xs leading-5 text-muted">
         {NOTICE_NOT_MEDICAL} · {NOTICE_PROTOTYPE}
