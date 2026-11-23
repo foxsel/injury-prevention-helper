@@ -18,9 +18,9 @@ export const SPORT_FOCUS: Record<Sport, readonly BodyPart[]> = {
   헬스: ["어깨", "무릎"],
 };
 
-/** 종목을 골랐을 때 입력 화면에 보여 주는 한 줄 안내(참고용) */
+/** 부위를 고르는 질문 아래에 보여 주는 안내(참고용). '추천' 표시가 붙은 부위를 설명한다. */
 export function focusHint(sport: Sport): string {
-  return `${sport}은(는) ${SPORT_FOCUS[sport].join("·")}에 부담이 많이 가는 것으로 알려져 있어요. 참고만 하고, 아픈 부위를 골라 주세요.`;
+  return `${sport}에서는 ${SPORT_FOCUS[sport].join("·")}에 부담이 많이 가는 것으로 알려져 '추천'으로 표시했어요. 참고만 하고, 실제로 신경 쓰이는 부위를 여러 곳 골라도 돼요.`;
 }
 
 /** 운동이 이 종목의 주요 부위를 하나라도 다루는지 */

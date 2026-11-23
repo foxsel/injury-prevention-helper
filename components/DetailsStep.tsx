@@ -10,7 +10,7 @@ import {
   type BodyPart,
 } from "../lib/constants";
 import { orderedParts, shouldAskWeight, type IntakeState } from "../lib/intake";
-import { focusHint } from "../lib/sportFocus";
+import { focusHint, SPORT_FOCUS } from "../lib/sportFocus";
 import type { ValidationIssue } from "../lib/validate";
 import { Card } from "./Card";
 import { Choice } from "./Choice";
@@ -115,11 +115,7 @@ export function DetailsStep({
             </Question>
           ) : null}
 
-          <Question
-            id="sport"
-            title="어떤 운동을 하나요?"
-            help={intake.sport ? focusHint(intake.sport) : undefined}
-          >
+          <Question id="sport" title="어떤 운동을 하나요?">
             {SPORTS.map((sport) => (
               <Choice
                 key={sport}
@@ -133,7 +129,11 @@ export function DetailsStep({
             ))}
           </Question>
 
-          <Question id="parts" title="어느 부위인가요?" help="여러 곳을 고를 수 있어요.">
+          <Question
+            id="parts"
+            title="어느 부위인가요?"
+            help={intake.sport ? focusHint(intake.sport) : "여러 곳을 고를 수 있어요."}
+          >
             {BODY_PARTS.map((part) => (
               <Choice
                 key={part}
@@ -141,6 +141,7 @@ export function DetailsStep({
                 name="parts"
                 checked={intake.selectedParts.includes(part)}
                 onChange={() => onTogglePart(part)}
+                badge={intake.sport && SPORT_FOCUS[intake.sport].includes(part) ? "추천" : undefined}
               >
                 {part}
               </Choice>

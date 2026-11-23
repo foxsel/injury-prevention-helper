@@ -183,9 +183,7 @@ export function Flow() {
         body: JSON.stringify(request),
       });
       const data = (await response.json()) as RecommendResponse;
-      // 결과 카드에 "이 종목의 주요 부위" 표시를 하려고 종목을 함께 넘긴다.
-      const view: ResultView =
-        data.status === "ok" ? { ...withBoost(data, request), sport: request.sport } as ResultView : data;
+      const view = data.status === "ok" ? withBoost(data, request) : data;
       // 추천받을 때 입력한 통증은 첫 기록의 운동 전 통증으로 넘겨, 같은 통증을 다시 묻지 않는다.
       saveIntakePain(view.status === "ok" ? buildIntakePainMap(view.exercises, request.parts) : {});
       setResult(view);
