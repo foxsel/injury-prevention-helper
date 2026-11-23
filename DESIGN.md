@@ -195,7 +195,8 @@ type RecommendResponse =
   | { status: "ok"; exercises: Exercise[] }                     // 최대 5개
   | { status: "blocked"; reason: "pain" | "weight" | "not-approved" }  // 추천 안 함
   | { status: "empty" }                                         // 조건에 맞는 운동 없음
-  | { status: "error"; code: "INVALID_INPUT" | "AI_FAILED" | "AI_TIMEOUT" };
+  | { status: "error"; code: "INVALID_INPUT"; issues: { field: string; message: string }[] }
+  | { status: "error"; code: "AI_FAILED" | "AI_TIMEOUT" };
 ```
 
 **운동 목록**은 `lib/exercises/data.ts`의 코드 안 목록이며 데이터베이스는 쓰지 않는다. 지원 부위는 발목·무릎·어깨로 확정하고(하체 부위는 발목·무릎), 종목과 부위 조합마다 운동이 하나 이상 있어야 한다.
@@ -254,6 +255,8 @@ type RecommendResponse =
 | `vitest` | 내가 쓴 코드가 맞게 동작하는지 자동으로 시험해 주는 도구 | 통증 6점 기준 같은 안전 규칙이 항상 지켜지는지 시험 | 권장 |
 
 그 밖의 도구(상태 관리 라이브러리, 데이터베이스, 로그인 도구 등)는 이번 범위에 필요 없어 쓰지 않는다.
+
+**AI 모델**: 기본은 `gpt-4.1-mini`(가볍고 빠른 모델)이고, 필요하면 `.env`에 `OPENAI_MODEL`을 적어 바꿀 수 있다. 입력 내용은 OpenAI 쪽에 대화 기록으로 남기지 않도록(`store: false`) 요청한다.
 
 ---
 
