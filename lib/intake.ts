@@ -1,7 +1,7 @@
 // Design Ref: §3.1 입력 영역, §4 데이터 흐름 ①, §5 RecommendRequest — 입력 화면의 값을 추천 요청으로 바꾼다.
 // Plan SC: 고르지 않은 항목은 친절한 문장으로 알려 주고, 통과한 값만 추천 요청이 된다.
 //
-// 화면(IntakeForm)은 이 파일의 함수만 호출한다. 화면 없이도 시험할 수 있도록 순수 함수로 만들었다.
+// 화면(Flow, DetailsStep)은 이 파일의 함수만 호출한다. 화면 없이도 시험할 수 있도록 순수 함수로 만들었다.
 
 import { BODY_PARTS, type BodyPart, type Sport, type UserType } from "./constants";
 import { needsWeightQuestion, type PainEntry } from "./safety";

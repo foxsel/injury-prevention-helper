@@ -15,7 +15,7 @@ export function CommonNotices() {
       aria-label="이용 안내"
       className="border-b border-notice-line bg-notice-bg text-notice-text"
     >
-      <ul className="mx-auto flex max-w-5xl flex-col gap-1 px-4 py-3 text-sm font-semibold sm:flex-row sm:gap-6">
+      <ul className="mx-auto flex max-w-5xl flex-col gap-1 px-4 py-2.5 text-[13px] font-medium sm:flex-row sm:gap-6">
         <li className="flex items-center gap-2">
           <span aria-hidden="true" className="size-1.5 rounded-full bg-accent" />
           {NOTICE_NOT_MEDICAL}
@@ -32,17 +32,17 @@ export function CommonNotices() {
 /** 첫 화면에만 놓는 AI 전송 안내 문구 */
 export function AiTransmissionNotice() {
   return (
-    <div
+    <p
       role="note"
-      className="flex items-start gap-3 rounded-3xl bg-surface p-5 text-sm leading-6 shadow-[0_2px_24px_rgba(0,0,0,0.06)] ring-1 ring-line"
+      className="inline-flex max-w-[34rem] items-start gap-2 rounded-2xl bg-surface/80 px-4 py-2.5 text-left text-xs leading-5 text-muted ring-1 ring-line backdrop-blur"
     >
       <span
         aria-hidden="true"
-        className="flex size-7 shrink-0 items-center justify-center rounded-full bg-accent-soft text-sm font-bold text-accent-text"
+        className="mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full bg-accent text-[10px] font-bold text-on-accent"
       >
         i
       </span>
-      <p>{NOTICE_AI_TRANSMISSION}</p>
-    </div>
+      <span>{NOTICE_AI_TRANSMISSION}</span>
+    </p>
   );
 }

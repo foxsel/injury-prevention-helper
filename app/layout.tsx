@@ -19,7 +19,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <div className="mx-auto flex max-w-5xl items-center gap-3 px-4 py-4">
             <span
               aria-hidden="true"
-              className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-accent text-xl font-bold text-white shadow-md"
+              className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-accent text-xl font-bold text-on-accent"
             >
               +
             </span>
@@ -30,7 +30,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           </div>
         </header>
         <CommonNotices />
-        <div className="flex-1">{children}</div>
+        <div className="flex flex-1 flex-col">{children}</div>
       </body>
     </html>
   );

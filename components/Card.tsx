@@ -11,7 +11,7 @@ interface CardProps {
 export function Card({ children, className = "" }: CardProps) {
   return (
     <div
-      className={`rounded-3xl bg-surface p-6 shadow-[0_2px_24px_rgba(0,0,0,0.06)] ring-1 ring-line ${className}`}
+      className={`rounded-[28px] bg-surface p-6 shadow-[0_2px_24px_rgba(0,0,0,0.05)] ring-1 ring-line sm:p-8 ${className}`}
     >
       {children}
     </div>
