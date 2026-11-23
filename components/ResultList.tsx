@@ -1,6 +1,7 @@
 // Design Ref: §3.1 결과 영역 — 추천된 운동 목록, 막힘(병원 상담 안내), 비었음, 오류를 보여 준다.
 // Plan SC: 모든 운동에 방법·횟수·세트·주의사항·중단 기준이 함께 보이고, 공통 안내 2종이 결과 아래에도 보인다.
 
+import Link from "next/link";
 import type { ReactNode } from "react";
 import type { Exercise } from "../lib/exercises/types";
 import {
@@ -67,6 +68,15 @@ function ExerciseCard({
           ))}
         </ul>
       </div>
+
+      <Link
+        href={`/guide/${exercise.id}`}
+        target="_blank"
+        rel="noopener"
+        className="mt-4 inline-block text-sm font-medium underline underline-offset-4"
+      >
+        가이드 따로 보기 ↗
+      </Link>
 
       {extraStops.length > 0 ? (
         <div className="mt-4 rounded-2xl bg-notice-bg px-4 py-3 text-sm leading-6">
