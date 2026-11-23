@@ -78,6 +78,23 @@ describe("전체 화면(공통 틀 + 첫 화면)", () => {
     expect(layoutOnly).not.toContain(NOTICE_AI_TRANSMISSION);
   });
 
+  it("입력 화면의 처음 모습: 유형, 종목 5개, 부위 3개와 [추천받기] 버튼이 보인다", () => {
+    const text = html.replace(/<[^>]*>/g, "");
+    for (const label of ["예방형", "회복형", "축구", "농구", "배구", "야구", "헬스", "발목", "무릎", "어깨"]) {
+      expect(text, label).toContain(label);
+    }
+    expect(text).toContain("추천받기");
+    // 선택 항목이 실제 입력칸으로 있는지 센다: 라디오 7개(유형 2 + 종목 5), 체크박스 3개(부위)
+    expect(count(html, 'type="radio"')).toBe(7);
+    expect(count(html, 'type="checkbox"')).toBe(3);
+    expect(count(html, 'type="range"')).toBe(0);
+    // 아직 고르지 않았으므로 아래 질문들은 보이지 않아야 한다.
+    expect(text).not.toContain("통증은 어느 정도인가요?");
+    expect(text).not.toContain("체중을 싣기 어려운가요?");
+    expect(text).not.toContain("운동해도 된다는 안내를 받았나요?");
+    expect(text).not.toContain("추천 결과");
+  });
+
   it("서비스 소개, 이용 방법 3단계, 안전 안내 영역이 있다", () => {
     // 제목 안에 강조(<span>)가 섞여 있으므로 태그를 뺀 글자로 확인한다.
     const text = html.replace(/<[^>]*>/g, "");

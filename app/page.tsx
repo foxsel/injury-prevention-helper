@@ -1,8 +1,9 @@
 // Design Ref: §3.1 `/` 첫 화면 — 서비스 소개와 AI 전송 안내.
-// 입력 영역과 결과 영역은 PLAN 7번 이후에 이 화면에 이어서 붙인다.
+// 입력 화면(IntakeForm)과 그 아래 결과 영역이 이 화면에 붙어 있다.
 
 import { Card } from "../components/Card";
 import { AiTransmissionNotice } from "../components/Disclaimer";
+import { IntakeForm } from "../components/IntakeForm";
 import {
   PainVisual,
   ResultVisual,
@@ -32,6 +33,11 @@ export default function Home() {
           중에서 알맞은 운동을 골라 방법과 주의사항을 함께 안내합니다. 로그인 없이
           바로 사용할 수 있습니다.
         </p>
+      </section>
+
+      <section aria-label="운동 추천받기" className="flex flex-col gap-4">
+        <IntakeForm />
+        <AiTransmissionNotice />
       </section>
 
       <section aria-labelledby="how-heading" className="flex flex-col gap-4">
@@ -78,8 +84,6 @@ export default function Home() {
           </ul>
         </Card>
       </section>
-
-      <AiTransmissionNotice />
     </main>
   );
 }

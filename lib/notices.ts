@@ -12,6 +12,22 @@ export const SERVICE_TAGLINE =
 export const NOTICE_NOT_MEDICAL = "의료 행위를 대신하지 않습니다";
 export const NOTICE_PROTOTYPE = "전문가 검토 전 시제품입니다";
 
+/** 추천을 막았을 때 사유별로 보여주는 안내 문구 (DESIGN 7번). 진단·판정 표현 없이 상담만 권한다. */
+export const BLOCK_MESSAGES = {
+  pain: "통증이 높아 운동을 추천하기 어렵습니다. 전문가(병원) 상담을 권합니다.",
+  weight:
+    "체중을 싣기 어려운 상태에서는 운동을 추천하지 않습니다. 전문가(병원) 상담을 권합니다.",
+  "not-approved": "치료를 맡은 의사에게 운동해도 되는지 먼저 확인한 뒤 이용해 주세요.",
+} as const;
+
+/** 추천 결과가 없거나 오류가 났을 때 보여주는 안내 문구 */
+export const RESULT_MESSAGES = {
+  empty: "조건에 맞는 운동을 찾지 못했습니다. 종목이나 부위를 바꿔 다시 선택해 보세요.",
+  aiFailed: "추천을 만드는 중 문제가 생겼습니다. 잠시 후 다시 시도해 주세요.",
+  aiTimeout: "응답이 늦어지고 있습니다. 잠시 후 다시 시도해 주세요.",
+  network: "서버에 연결하지 못했습니다. 인터넷 연결을 확인하고 다시 시도해 주세요.",
+} as const;
+
 /** 첫 화면에만 보이는 AI 전송 안내 문구 (PRD 7번 원문) */
 export const NOTICE_AI_TRANSMISSION =
   "입력한 내용(종목·부위·통증 점수)은 AI 서비스로 전송되어 답변을 만드는 데 사용됩니다";
