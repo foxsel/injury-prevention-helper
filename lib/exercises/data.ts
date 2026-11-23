@@ -10,7 +10,11 @@
 // - 발목 회복 운동 4개 (모든 지원 종목 공통)  ← AAFP 발목 염좌 환자 안내
 // - 발목·무릎 예방 운동 6개 (모든 지원 종목 공통) ← FIFA 11+ 부상 예방 소책자
 // - 무릎 회복 운동 3개, 어깨 회복 운동 4개 (모든 지원 종목 공통) ← 분당서울대병원 수술 후 운동교육
-// 아직 비어 있는 범위: 어깨 예방
+// - 어깨 예방 운동 4개 (모든 지원 종목 공통) ← ⚠ 근거 자료 없는 가상 샘플 데이터
+//
+// ⚠ 가상 샘플 데이터 (source가 SAMPLE_SOURCE인 운동)
+//   근거 자료를 찾지 못해 실습용으로 임의로 만든 데이터다. 횟수·세트도 임의 값이다.
+//   실제 서비스에 내보내기 전에 반드시 근거 자료와 전문가 검토로 교체해야 한다.
 //   → 근거 자료를 확인한 뒤 같은 형식으로 추가한다.
 
 import { SPORTS, STOP_CRITERIA_TEXT } from "../constants";
@@ -64,6 +68,17 @@ const SNUBH_SHOULDER = "분당서울대병원 재활의학과 환자교육: 어�
 // 자료에는 없고 우리가 덧붙인 안전 문구: 수술 후 프로그램을 참고했기 때문
 const SURGERY_CAUTION =
   "수술을 받았다면 담당 의료진이 정한 시기와 운동 범위를 먼저 따른다.";
+
+// ───────────────────────────────────────────────────────────────
+// 가상 샘플 데이터 (어깨 예방)
+// 근거 자료 없이 실습용으로 만든 운동이다. 일반적으로 가볍다고 알려진 동작만 골랐지만
+// 어떤 자료로도 확인하지 않았고, 횟수·세트는 임의 값이다.
+// ───────────────────────────────────────────────────────────────
+export const SAMPLE_SOURCE = "가상 샘플 데이터(근거 자료 없음, 실습용)";
+
+// 사용자 화면에도 보이도록 주의사항 맨 앞에 넣는다.
+const SAMPLE_CAUTION =
+  "이 운동은 근거 자료 없이 실습용으로 만든 가상 샘플이다. 실제 서비스 전에 근거 자료와 전문가 검토로 바꿔야 한다.";
 
 export const EXERCISES: Exercise[] = [
   // ── 발목 회복 (AAFP) ─────────────────────────────────────────
@@ -484,5 +499,90 @@ export const EXERCISES: Exercise[] = [
     ],
     stopCriteria: [STOP_CRITERIA_TEXT],
     source: SNUBH_SHOULDER,
+  },
+
+  // ── 어깨 예방 (가상 샘플 데이터) ─────────────────────────────
+  {
+    id: "shoulder-sample-scapular-squeeze-01",
+    highImpact: false,
+    name: "날개뼈 모으기",
+    description:
+      "[가상 샘플] 서거나 앉아서 양쪽 날개뼈를 뒤로 모았다 푸는 가벼운 운동입니다. 어깨를 으쓱 올리지 않고 날개뼈만 모으는 느낌으로 하세요.",
+    sports: [...SPORTS],
+    bodyParts: ["어깨"],
+    purpose: "예방",
+    steps: [
+      "의자에 앉거나 서서 팔을 편하게 내린다.",
+      "어깨를 올리지 않은 채 양쪽 날개뼈를 등 가운데로 모은다.",
+      "5초 동안 유지한 뒤 천천히 힘을 푼다.",
+    ],
+    reps: "10회",
+    sets: "2세트",
+    cautions: [SAMPLE_CAUTION, "어깨가 귀 쪽으로 올라가지 않게 한다."],
+    stopCriteria: [STOP_CRITERIA_TEXT],
+    source: SAMPLE_SOURCE,
+  },
+  {
+    id: "shoulder-sample-arm-circle-01",
+    highImpact: false,
+    name: "팔 작은 원 돌리기",
+    description:
+      "[가상 샘플] 팔을 옆으로 벌리고 작은 원을 그리며 어깨를 부드럽게 푸는 준비 운동입니다. 크게 휘두르지 말고 작게 시작하세요.",
+    sports: [...SPORTS],
+    bodyParts: ["어깨"],
+    purpose: "예방",
+    steps: [
+      "발을 어깨 너비로 벌리고 서서 양팔을 옆으로 어깨 높이까지 든다.",
+      "팔을 쭉 편 채 작은 원을 그리며 앞으로 돌린다.",
+      "같은 횟수만큼 뒤로 돌린다.",
+    ],
+    reps: "방향마다 10회",
+    sets: "2세트",
+    cautions: [
+      SAMPLE_CAUTION,
+      "처음에는 아주 작은 원으로 시작하고, 어깨에 불편감이 있으면 멈춘다.",
+    ],
+    stopCriteria: [STOP_CRITERIA_TEXT],
+    source: SAMPLE_SOURCE,
+  },
+  {
+    id: "shoulder-sample-wall-pushup-01",
+    highImpact: false,
+    name: "벽 짚고 팔굽혀펴기",
+    description:
+      "[가상 샘플] 벽에 손을 짚고 하는 가벼운 팔굽혀펴기로, 어깨와 날개뼈 주변을 안정적으로 쓰는 연습입니다. 바닥에서 하는 팔굽혀펴기보다 부담이 작은 방식입니다.",
+    sports: [...SPORTS],
+    bodyParts: ["어깨"],
+    purpose: "예방",
+    steps: [
+      "벽에서 한 걸음쯤 떨어져 서서 어깨 너비로 벽에 두 손을 짚는다.",
+      "몸을 곧게 편 채 팔꿈치를 굽혀 가슴을 벽 쪽으로 천천히 가져간다.",
+      "팔을 펴며 천천히 돌아온다.",
+    ],
+    reps: "10회",
+    sets: "2세트",
+    cautions: [SAMPLE_CAUTION, "허리가 꺾이거나 엉덩이가 빠지지 않게 몸을 곧게 유지한다."],
+    stopCriteria: [STOP_CRITERIA_TEXT],
+    source: SAMPLE_SOURCE,
+  },
+  {
+    id: "shoulder-sample-band-row-01",
+    highImpact: false,
+    name: "밴드 당기기(노 젓기)",
+    description:
+      "[가상 샘플] 탄력 밴드를 잡고 노를 젓듯 몸 쪽으로 당겨 어깨 뒤쪽과 등 근육을 쓰는 운동입니다. 약한 밴드로 시작하세요.",
+    sports: [...SPORTS],
+    bodyParts: ["어깨"],
+    purpose: "예방",
+    steps: [
+      "탄력 밴드를 가슴 높이의 단단한 곳에 고정하고, 두 손으로 끝을 잡고 선다.",
+      "팔꿈치를 몸 옆으로 붙이듯 굽히며 밴드를 가슴 쪽으로 당긴다.",
+      "날개뼈를 모은 채 잠깐 멈춘 뒤 천천히 돌아온다.",
+    ],
+    reps: "10~12회",
+    sets: "2세트",
+    cautions: [SAMPLE_CAUTION, "처음에는 약한 밴드로 시작하고, 어깨가 앞으로 말리지 않게 한다."],
+    stopCriteria: [STOP_CRITERIA_TEXT],
+    source: SAMPLE_SOURCE,
   },
 ];
