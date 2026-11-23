@@ -168,6 +168,7 @@ type UserType = "예방형" | "회복형";
 interface Exercise {
   id: string;                 // 고유 번호 (예: "ankle-balance-01")
   name: string;               // 운동 이름
+  description: string;        // 부연설명 (이 운동이 무엇이고 핵심이 무엇인지 한두 문장)
   sports: Sport[];            // 해당 종목
   bodyParts: BodyPart[];      // 해당 부위
   purpose: "예방" | "회복";
@@ -176,6 +177,7 @@ interface Exercise {
   sets: string;               // 세트 (예: "2세트")
   cautions: string[];         // 주의사항 (1개 이상)
   stopCriteria: string[];     // 중단 기준 (통증 6점 이상 문구 포함)
+  source: string;             // 참고한 자료 (예: "FIFA 11+ 프로그램", 없으면 "일반 지침")
 }
 
 // 추천 요청 (브라우저 → 서버)

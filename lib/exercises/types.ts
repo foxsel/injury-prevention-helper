@@ -6,6 +6,8 @@ export interface Exercise {
   id: string;
   /** 운동 이름 */
   name: string;
+  /** 부연설명. 이 운동이 무엇이고 어떤 점이 핵심인지 알려주는 한두 문장 */
+  description: string;
   /** 이 운동을 추천할 수 있는 종목 */
   sports: Sport[];
   /** 이 운동이 다루는 부위 */
