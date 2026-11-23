@@ -6,6 +6,7 @@ import type { RecommendRequest } from "./validate";
 import { boostImproving, MAX_BOOSTED, safeCandidates } from "./boost";
 import {
   analyzeTrend,
+  EFFECT_DROP_POINTS,
   entriesFor,
   improvingExerciseIds,
   lastPainAfter,
@@ -13,7 +14,7 @@ import {
   serializeLog,
   type LogEntry,
 } from "./log";
-import { TREND_MESSAGES } from "./notices";
+import { effectMessage, TREND_MESSAGES } from "./notices";
 
 let clock = 0;
 /** 시험용 기록: 호출할 때마다 시각이 1분씩 늦어진다. */
@@ -90,6 +91,50 @@ describe("통증 변화 분석", () => {
       for (const term of FORBIDDEN_TERMS) expect(text).not.toContain(term);
     }
     expect(TREND_MESSAGES.consult).toContain("병원 진료");
+  });
+});
+
+describe("2점 이상 줄었을 때 효과 분석", () => {
+  it("기준은 2점이다", () => {
+    expect(EFFECT_DROP_POINTS).toBe(2);
+  });
+
+  it("통증이 낮아지는 흐름에서 합쳐서 2점 이상 줄면 효과 문구 대상이다", () => {
+    const t = analyzeTrend(series(5, 4, 3));
+    expect(t.status).toBe("improving");
+    expect([t.dropFrom, t.dropTo, t.drop, t.effective]).toEqual([5, 3, 2, true]);
+  });
+
+  it("한 번에 2점 이상 줄어도 대상이다(5점 → 3점)", () => {
+    const t = analyzeTrend(series(5, 3));
+    expect(t.status).toBe("steady");
+    expect(t.effective).toBe(true);
+    expect(t.drop).toBe(2);
+  });
+
+  it("1점만 줄면 대상이 아니다", () => {
+    expect(analyzeTrend(series(4, 3)).effective).toBe(false);
+    expect(analyzeTrend(series(3, 4, 3)).effective).toBe(false);
+  });
+
+  it("줄다가 다시 높아졌거나 변화가 없으면 대상이 아니다", () => {
+    expect(analyzeTrend(series(5, 3, 4)).effective).toBe(false);
+    expect(analyzeTrend(series(3, 3, 3)).effective).toBe(false);
+    expect(analyzeTrend([]).effective).toBe(false);
+    expect(analyzeTrend(series(3)).effective).toBe(false);
+  });
+
+  it("줄었어도 가장 최근 통증이 6점 이상이면 병원 상담이 먼저라 대상이 아니다", () => {
+    const t = analyzeTrend(series(9, 7));
+    expect(t.status).toBe("consult");
+    expect(t.effective).toBe(false);
+  });
+
+  it("문구에 줄어든 점수가 들어 있고 효과를 보장하는 표현이 없다", () => {
+    const text = effectMessage(5, 3);
+    expect(text).toContain("5점에서 3점으로 2점 줄었어요");
+    expect(text).toContain("효과를 보이는");
+    for (const term of FORBIDDEN_TERMS) expect(text).not.toContain(term);
   });
 });
 

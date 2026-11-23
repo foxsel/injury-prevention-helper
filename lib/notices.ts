@@ -54,3 +54,11 @@ export const TREND_MESSAGES = {
   note: "이 분석은 기록한 숫자만 보고 알려 드리는 참고용이며, 병명을 판단하거나 치료를 정해 주지 않습니다.",
   boosted: "통증이 줄고 있는 운동",
 } as const;
+
+/**
+ * 통증이 2점 이상 줄었을 때 보여 주는 문구. 효과를 보장하지 않고, 기록된 숫자로 본 "흐름"만 말한다.
+ * (PRD: "완치", "100% 예방" 같은 효과 보장 표현 금지)
+ */
+export function effectMessage(from: number, to: number): string {
+  return `통증이 ${from}점에서 ${to}점으로 ${from - to}점 줄었어요. 이 운동이 효과를 보이는 것으로 보여요. 다만 기록만으로 확정할 수는 없고 사람마다 달라요.`;
+}

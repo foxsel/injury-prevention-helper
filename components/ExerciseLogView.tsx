@@ -7,7 +7,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { EXERCISES } from "../lib/exercises/data";
 import { analyzeTrend, entriesFor, type TrendStatus } from "../lib/log";
-import { LOG_MESSAGES, TREND_MESSAGES } from "../lib/notices";
+import { effectMessage, LOG_MESSAGES, TREND_MESSAGES } from "../lib/notices";
 import { Card } from "./Card";
 import { PainChart } from "./PainChart";
 import { useLog } from "./logStore";
@@ -95,6 +95,14 @@ export function ExerciseLogView({ exerciseId }: { exerciseId: string }) {
                   <li key={reason}>{reason}</li>
                 ))}
               </ul>
+            ) : null}
+            {trend.effective ? (
+              <p
+                role="note"
+                className="mt-3 rounded-2xl bg-notice-bg px-4 py-3 font-semibold leading-7 text-notice-text"
+              >
+                {effectMessage(trend.dropFrom, trend.dropTo)}
+              </p>
             ) : null}
             <p className="mt-3 leading-7">{BODIES[trend.status]}</p>
             <p className={`mt-4 text-xs leading-5 ${strong ? "opacity-80" : "text-muted"}`}>
