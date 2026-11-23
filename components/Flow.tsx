@@ -14,7 +14,7 @@ import type { ValidationIssue } from "../lib/validate";
 import { DetailsStep } from "./DetailsStep";
 import { DotHands } from "./DotHands";
 import { HeroStep } from "./HeroStep";
-import { ResultPreview, type ResultView } from "./ResultPreview";
+import { ResultList, type ResultView } from "./ResultList";
 import { TypeStep } from "./TypeStep";
 
 type Step = "hero" | "type" | "details";
@@ -50,6 +50,13 @@ export function Flow() {
     document.getElementById("step-heading")?.focus({ preventScroll: true });
     window.scrollTo({ top: 0 });
   }, [step]);
+
+  // 결과가 나오면 화면 안으로 부드럽게 옮겨 보여 준다.
+  useEffect(() => {
+    if (result) {
+      document.getElementById("result-heading")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [result]);
 
   useEffect(
     () => () => {
@@ -171,7 +178,7 @@ export function Flow() {
             />
             {result ? (
               <div className="mx-auto -mt-4 w-full max-w-[760px] px-4 pb-12">
-                <ResultPreview result={result} />
+                <ResultList result={result} />
               </div>
             ) : null}
           </>

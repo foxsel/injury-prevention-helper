@@ -1,0 +1,37 @@
+// Design Ref: §11 시험 계획 — 결과 화면이 모든 필수 정보와 안내 문구를 보여 주는지 확인한다.
+import { renderToStaticMarkup } from "react-dom/server";
+import { describe, expect, it } from "vitest";
+import { EXERCISES } from "../lib/exercises/data";
+import { BLOCK_MESSAGES, NOTICE_NOT_MEDICAL, NOTICE_PROTOTYPE, RESULT_MESSAGES } from "../lib/notices";
+import { ResultList } from "./ResultList";
+
+const render = (result: Parameters<typeof ResultList>[0]["result"]) =>
+  renderToStaticMarkup(<ResultList result={result} />);
+
+describe("추천 결과 화면", () => {
+  it("모든 운동에 방법·횟수·세트·주의사항·중단 기준이 보인다", () => {
+    const html = render({ status: "ok", exercises: EXERCISES.slice(0, 3) });
+    for (const e of EXERCISES.slice(0, 3)) {
+      expect(html).toContain(e.name);
+      expect(html).toContain(e.reps);
+      expect(html).toContain(e.sets);
+      for (const c of e.stopCriteria) expect(html).toContain(c);
+      for (const s of e.steps) expect(html).toContain(s);
+      for (const c of e.cautions) expect(html).toContain(c);
+    }
+  });
+
+  it("공통 안내 2종이 결과 아래에 보인다", () => {
+    const html = render({ status: "empty" });
+    expect(html).toContain(NOTICE_NOT_MEDICAL);
+    expect(html).toContain(NOTICE_PROTOTYPE);
+  });
+
+  it("막힘·비었음·오류별 안내 문구를 보여 준다", () => {
+    expect(render({ status: "blocked", reason: "pain" })).toContain(BLOCK_MESSAGES.pain);
+    expect(render({ status: "empty" })).toContain(RESULT_MESSAGES.empty);
+    expect(render({ status: "network-error" })).toContain(RESULT_MESSAGES.network);
+    expect(render({ status: "error", code: "AI_TIMEOUT" })).toContain(RESULT_MESSAGES.aiTimeout);
+    expect(render({ status: "error", code: "AI_FAILED" })).toContain(RESULT_MESSAGES.aiFailed);
+  });
+});
