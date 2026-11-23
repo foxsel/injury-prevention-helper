@@ -10,12 +10,8 @@ import {
 /** 모든 화면의 위쪽(공통 틀)에 한 번만 놓는 공통 안내 문구 2종 */
 export function CommonNotices() {
   return (
-    <div
-      role="note"
-      aria-label="이용 안내"
-      className="border-b border-notice-line bg-notice-bg text-notice-text"
-    >
-      <ul className="mx-auto flex max-w-5xl flex-col gap-1 px-4 py-2.5 text-[13px] font-medium sm:flex-row sm:gap-6">
+    <div role="note" aria-label="이용 안내">
+      <ul className="flex flex-col gap-1.5 text-[13px] font-medium">
         <li className="flex items-center gap-2">
           <span aria-hidden="true" className="size-1.5 rounded-full bg-accent" />
           {NOTICE_NOT_MEDICAL}

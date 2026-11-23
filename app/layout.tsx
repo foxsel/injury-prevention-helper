@@ -2,7 +2,7 @@
 // Plan SC: 헤더(서비스 이름 + 한 줄 소개)와 공통 안내 문구 2종이 모든 화면에 한 번씩만 보인다.
 
 import type { Metadata } from "next";
-import { CommonNotices } from "../components/Disclaimer";
+import { InfoButton } from "../components/InfoButton";
 import { SERVICE_NAME, SERVICE_TAGLINE } from "../lib/notices";
 import "./globals.css";
 
@@ -15,21 +15,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="ko" className="h-full antialiased">
       <body className="flex min-h-full flex-col break-keep">
-        <header className="border-b border-line bg-surface">
-          <div className="mx-auto flex max-w-5xl items-center gap-3 px-4 py-4">
-            <span
-              aria-hidden="true"
-              className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-accent text-xl font-bold text-on-accent"
-            >
-              +
-            </span>
-            <div>
-              <p className="text-lg font-bold leading-6">{SERVICE_NAME}</p>
-              <p className="text-sm leading-5 text-muted">{SERVICE_TAGLINE}</p>
-            </div>
-          </div>
-        </header>
-        <CommonNotices />
+        <InfoButton />
         <div className="flex flex-1 flex-col">{children}</div>
       </body>
     </html>
