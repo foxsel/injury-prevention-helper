@@ -42,15 +42,15 @@ describe("통증 안내 기준", () => {
 });
 
 describe("기록 만들기·저장 글자", () => {
-  it("기록에는 운동 번호·날짜·통증·시각만 담긴다", () => {
-    const e = makeEntry("ankle-01", 3, at("2026-11-23T10:00:00"));
-    expect(Object.keys(e).sort()).toEqual(["at", "date", "exerciseId", "id", "pain"]);
+  it("기록에는 운동 번호·날짜·운동 전후 통증·시각만 담긴다", () => {
+    const e = makeEntry("ankle-01", 0, 3, at("2026-11-23T10:00:00"));
+    expect(Object.keys(e).sort()).toEqual(["at", "date", "exerciseId", "id", "pain", "painBefore"]);
     expect(e.date).toBe("2026-11-23");
     expect(localDate(at("2026-01-05T23:59:00"))).toBe("2026-01-05");
   });
 
   it("저장했다가 다시 읽으면 같은 기록이 나온다", () => {
-    const entries = addEntry([], makeEntry("a", 2, at("2026-11-23T10:00:00")));
+    const entries = addEntry([], makeEntry("a", 0, 2, at("2026-11-23T10:00:00")));
     expect(parseLog(serializeLog(entries))).toEqual(entries);
   });
 
@@ -62,7 +62,7 @@ describe("기록 만들기·저장 글자", () => {
   });
 
   it("모양이 틀린 기록(통증 범위 밖·소수·날짜 형식)은 버리고 맞는 것만 남긴다", () => {
-    const good = makeEntry("a", 4, at("2026-11-23T10:00:00"));
+    const good = makeEntry("a", 0, 4, at("2026-11-23T10:00:00"));
     const raw = JSON.stringify([
       good,
       { ...good, id: "x1", pain: 11 },
@@ -78,24 +78,24 @@ describe("기록 만들기·저장 글자", () => {
   it("기록은 최근 것만 한도까지 남긴다", () => {
     let entries = parseLog(null);
     for (let i = 0; i < MAX_LOG_ENTRIES + 20; i++) {
-      entries = addEntry(entries, makeEntry("a", 1, new Date(2026, 0, 1, 0, 0, i)));
+      entries = addEntry(entries, makeEntry("a", 0, 1, new Date(2026, 0, 1, 0, 0, i)));
     }
     expect(entries).toHaveLength(MAX_LOG_ENTRIES);
     expect(entries[entries.length - 1].at).toBe(new Date(2026, 0, 1, 0, 0, MAX_LOG_ENTRIES + 19).getTime());
   });
 
   it("기록을 하나 지운다", () => {
-    const a = makeEntry("a", 1, at("2026-11-23T10:00:00"));
-    const b = makeEntry("b", 2, at("2026-11-23T11:00:00"));
+    const a = makeEntry("a", 0, 1, at("2026-11-23T10:00:00"));
+    const b = makeEntry("b", 0, 2, at("2026-11-23T11:00:00"));
     expect(removeEntry([a, b], a.id)).toEqual([b]);
   });
 });
 
 describe("통증 변화와 날짜별 묶음", () => {
-  const e1 = makeEntry("a", 5, at("2026-11-21T09:00:00"));
-  const e2 = makeEntry("a", 3, at("2026-11-22T09:00:00"));
-  const e3 = makeEntry("b", 7, at("2026-11-22T10:00:00"));
-  const e4 = makeEntry("a", 3, at("2026-11-23T09:00:00"));
+  const e1 = makeEntry("a", 0, 5, at("2026-11-21T09:00:00"));
+  const e2 = makeEntry("a", 0, 3, at("2026-11-22T09:00:00"));
+  const e3 = makeEntry("b", 0, 7, at("2026-11-22T10:00:00"));
+  const e4 = makeEntry("a", 0, 3, at("2026-11-23T09:00:00"));
   const all = [e1, e2, e3, e4];
 
   it("같은 운동의 바로 이전 기록과 비교한다", () => {

@@ -9,11 +9,16 @@ import {
   NOTICE_NOT_MEDICAL,
   NOTICE_PROTOTYPE,
   RESULT_MESSAGES,
+  TREND_MESSAGES,
 } from "../lib/notices";
 import type { RecommendResponse } from "../lib/recommend";
 
 /** 서버가 보낸 결과 + 서버에 닿지 못한 경우 */
-export type ResultView = RecommendResponse | { status: "network-error" };
+export type ResultView =
+  | Exclude<RecommendResponse, { status: "ok" }>
+  // boosted: 진행 기록에서 통증이 줄고 있어 앞쪽으로 올라온 운동의 번호
+  | { status: "ok"; exercises: Exercise[]; boosted?: string[] }
+  | { status: "network-error" };
 
 /** 추천된 모든 운동에 똑같이 들어 있는 중단 기준(한 번만 보여 준다) */
 export function commonStopCriteria(exercises: Exercise[]): string[] {
@@ -25,10 +30,12 @@ function ExerciseCard({
   exercise,
   index,
   common,
+  boosted,
 }: {
   exercise: Exercise;
   index: number;
   common: string[];
+  boosted: boolean;
 }) {
   const extraStops = exercise.stopCriteria.filter((c) => !common.includes(c));
   return (
@@ -41,6 +48,11 @@ function ExerciseCard({
           {index + 1}
         </span>
         <div className="min-w-0">
+          {boosted ? (
+            <p className="mb-1 inline-block rounded-full bg-accent px-2.5 py-0.5 text-[11px] font-semibold text-on-accent">
+              {TREND_MESSAGES.boosted}
+            </p>
+          ) : null}
           <h4 className="text-lg font-semibold leading-7">{exercise.name}</h4>
           <p className="mt-1 text-sm leading-6 text-muted">{exercise.description}</p>
         </div>
@@ -127,7 +139,13 @@ export function ResultList({
         ) : null}
         <ul className="flex flex-col gap-4">
           {result.exercises.map((exercise, i) => (
-            <ExerciseCard key={exercise.id} exercise={exercise} index={i} common={common} />
+            <ExerciseCard
+              key={exercise.id}
+              exercise={exercise}
+              index={i}
+              common={common}
+              boosted={result.boosted?.includes(exercise.id) ?? false}
+            />
           ))}
         </ul>
         </>

@@ -19,6 +19,7 @@ export function LogView() {
   const entries = useLog();
   const [confirmingClear, setConfirmingClear] = useState(false);
   const days = groupByDate(entries);
+  const exerciseIds = [...new Set(entries.map((e) => e.exerciseId))];
 
   return (
     <section className="mx-auto flex w-full max-w-[760px] flex-1 flex-col px-4 pb-12 pt-[clamp(72px,10vh,104px)]">
@@ -33,6 +34,21 @@ export function LogView() {
         </Card>
       ) : (
         <div className="mt-8 flex flex-col gap-6">
+          <div>
+            <h2 className="text-sm font-semibold text-faint">운동별 그래프·분석 보기</h2>
+            <ul className="mt-2 flex flex-wrap gap-2">
+              {exerciseIds.map((id) => (
+                <li key={id}>
+                  <Link
+                    href={`/log/${id}`}
+                    className="inline-flex min-h-10 items-center rounded-full bg-surface px-4 text-sm font-medium ring-1 ring-line transition hover:ring-foreground/30"
+                  >
+                    {nameOf(id)}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
           {days.map((day) => (
             <div key={day.date}>
               <h2 className="text-sm font-semibold text-faint">{day.date}</h2>
@@ -44,13 +60,13 @@ export function LogView() {
                   >
                     <div className="min-w-0">
                       <Link
-                        href={`/guide/${entry.exerciseId}`}
+                        href={`/log/${entry.exerciseId}`}
                         className="font-semibold underline-offset-4 hover:underline"
                       >
-                        {nameOf(entry.exerciseId)}
+                        {nameOf(entry.exerciseId)} <span aria-hidden="true">→</span>
                       </Link>
                       <p className="mt-1 text-sm text-muted">
-                        운동 후 통증 {entry.pain}점 · {describeChange(entry.pain, previousPain(entries, entry))}
+                        {entry.painBefore === undefined ? "" : `운동 전 ${entry.painBefore}점 → `}운동 후 {entry.pain}점 · {describeChange(entry.pain, previousPain(entries, entry))}
                       </p>
                       {shouldAdviseStop(entry.pain) ? (
                         <p className="mt-2 rounded-2xl bg-accent px-3 py-2 text-sm font-medium text-on-accent">

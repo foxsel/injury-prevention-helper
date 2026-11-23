@@ -57,6 +57,7 @@
 | `/` | 첫 화면 + 입력 + 결과 | 입력 → 결과를 한 화면 흐름으로 처리 |
 | `/guide/[id]` | 운동 가이드 | 운동 하나의 방법·주의사항·중단 기준 표시 (주소에는 운동 번호만 있고 개인 정보 없음) |
 | `/log` | 진행 기록 (nice) | 운동 완료와 운동 후 통증을 날짜별로 보여 줌. 기록은 이 브라우저(localStorage)에만 저장하고 서버로 보내지 않음. 통증 6점 이상이면 중단·상담 안내 |
+| `/log/[id]` | 운동별 기록 (nice) | 한 운동의 운동 전·후 통증 그래프와 분석. 3번 연속 높아지거나 6점 이상이면 병원 진료 제안, 2번 연속 낮아지면 다음 추천에서 앞쪽에 더 보여 줌 |
 
 ### 3.0 화면 흐름 (v0.4에서 바뀜)
 
@@ -354,7 +355,7 @@ my-app/
 | 11 | 예외 화면 | `components/Notice.tsx` |
 | 12 | 점검 | — |
 | 13 | Vercel 배포 | Vercel 환경변수 |
-| 14 | (nice) 진행 기록 | `app/log/page.tsx`, `components/LogView.tsx`, `components/RecordCard.tsx`, `components/logStore.ts`, `lib/log.ts` |
+| 14 | (nice) 진행 기록 | `app/log/page.tsx`, `app/log/[id]/page.tsx`, `components/LogView.tsx`, `components/ExerciseLogView.tsx`, `components/PainChart.tsx`, `components/RecordCard.tsx`, `components/logStore.ts`, `lib/log.ts`, `lib/boost.ts` |
 
 ### 12.2 구현할 때 주의
 

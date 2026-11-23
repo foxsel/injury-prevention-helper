@@ -9,6 +9,8 @@ import type { BodyPart, UserType } from "../lib/constants";
 import type { HandsMode } from "../lib/dotMatrix";
 import { EMPTY_INTAKE, validateIntake, type IntakeState } from "../lib/intake";
 import type { RecommendResponse } from "../lib/recommend";
+import { boostImproving, safeCandidates } from "../lib/boost";
+import { improvingExerciseIds, parseLog, LOG_KEY } from "../lib/log";
 import { judgeSafety } from "../lib/safety";
 import { consumeStart, START_EVENT } from "../lib/startSignal";
 import type { RecommendRequest, ValidationIssue } from "../lib/validate";
@@ -153,6 +155,18 @@ export function Flow() {
     await requestRecommend(checked.request);
   }
 
+  /** 진행 기록에서 통증이 줄고 있는 운동을 추천 앞쪽에 올린다. 기록은 서버로 보내지 않고 이 브라우저에서만 쓴다. */
+  function withBoost(data: Extract<RecommendResponse, { status: "ok" }>, request: RecommendRequest): ResultView {
+    try {
+      const improving = improvingExerciseIds(parseLog(window.localStorage.getItem(LOG_KEY)));
+      if (improving.length === 0) return data;
+      const { exercises, boosted } = boostImproving(data.exercises, safeCandidates(request), improving);
+      return boosted.length > 0 ? { status: "ok", exercises, boosted } : data;
+    } catch {
+      return data; // 저장소를 읽을 수 없으면 서버가 준 결과를 그대로 보여 준다.
+    }
+  }
+
   async function requestRecommend(request: RecommendRequest) {
     setPending(true);
     try {
@@ -161,7 +175,8 @@ export function Flow() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(request),
       });
-      setResult((await response.json()) as RecommendResponse);
+      const data = (await response.json()) as RecommendResponse;
+      setResult(data.status === "ok" ? withBoost(data, request) : data);
     } catch {
       setResult({ status: "network-error" });
     } finally {

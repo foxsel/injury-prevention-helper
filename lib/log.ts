@@ -16,6 +16,8 @@ export interface LogEntry {
   exerciseId: string;
   /** 기록한 날(이 기기의 날짜, YYYY-MM-DD) */
   date: string;
+  /** 운동 전 통증 0~10. 이 값이 생기기 전에 만든 옛 기록에는 없을 수 있다. */
+  painBefore?: number;
   /** 운동 후 통증 0~10 */
   pain: number;
   /** 기록한 시각(밀리초). 순서를 가릴 때 쓴다. */
@@ -24,18 +26,20 @@ export interface LogEntry {
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
+function isPain(value: unknown): value is number {
+  return typeof value === "number" && Number.isInteger(value) && value >= PAIN_MIN && value <= PAIN_MAX;
+}
+
 function isEntry(value: unknown): value is LogEntry {
   if (typeof value !== "object" || value === null) return false;
   const v = value as Record<string, unknown>;
+  if (v.painBefore !== undefined && !isPain(v.painBefore)) return false;
   return (
     typeof v.id === "string" &&
     typeof v.exerciseId === "string" &&
     typeof v.date === "string" &&
     DATE_PATTERN.test(v.date) &&
-    typeof v.pain === "number" &&
-    Number.isInteger(v.pain) &&
-    v.pain >= PAIN_MIN &&
-    v.pain <= PAIN_MAX &&
+    isPain(v.pain) &&
     typeof v.at === "number" &&
     Number.isFinite(v.at)
   );
@@ -66,9 +70,14 @@ export function localDate(now: Date): string {
   return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
 }
 
-export function makeEntry(exerciseId: string, pain: number, now: Date): LogEntry {
+export function makeEntry(
+  exerciseId: string,
+  painBefore: number,
+  pain: number,
+  now: Date,
+): LogEntry {
   const at = now.getTime();
-  return { id: `${at}-${exerciseId}`, exerciseId, date: localDate(now), pain, at };
+  return { id: `${at}-${exerciseId}`, exerciseId, date: localDate(now), painBefore, pain, at };
 }
 
 export function addEntry(entries: LogEntry[], entry: LogEntry): LogEntry[] {
@@ -77,6 +86,17 @@ export function addEntry(entries: LogEntry[], entry: LogEntry): LogEntry[] {
 
 export function removeEntry(entries: LogEntry[], id: string): LogEntry[] {
   return entries.filter((e) => e.id !== id);
+}
+
+/** 한 운동의 기록만 시간 순서(오래된 것 먼저)로 골라낸다. */
+export function entriesFor(entries: LogEntry[], exerciseId: string): LogEntry[] {
+  return entries.filter((e) => e.exerciseId === exerciseId).sort((a, b) => a.at - b.at);
+}
+
+/** 이 운동에서 가장 최근에 기록한 "운동 전 통증". 없으면 null. (다음 기록에서 입력을 건너뛰는 데 쓴다) */
+export function lastPainBefore(entries: LogEntry[], exerciseId: string): number | null {
+  const list = entriesFor(entries, exerciseId).filter((e) => e.painBefore !== undefined);
+  return list.length > 0 ? (list[list.length - 1].painBefore as number) : null;
 }
 
 /** 통증을 이 점수로 기록했을 때 운동 중단과 상담을 안내해야 하는지 (추천 기준과 같은 6점) */
@@ -115,4 +135,67 @@ export function groupByDate(entries: LogEntry[]): LogDay[] {
     else days.push({ date: entry.date, entries: [entry] });
   }
   return days;
+}
+
+// ---- 통증 변화 분석 ----
+
+export type TrendStatus = "need-more" | "consult" | "rising" | "improving" | "steady";
+
+/** 통증이 연속으로 이만큼 높아지면 병원 진료·상담을 권한다. */
+export const RISING_CONSULT_COUNT = 3;
+/** 통증이 연속으로 이만큼 낮아지면 이 운동을 추천에서 더 앞에 보여 준다. */
+export const FALLING_IMPROVE_COUNT = 2;
+
+export interface Trend {
+  status: TrendStatus;
+  /** 그렇게 판단한 이유(화면에 보여 줄 문장) */
+  reasons: string[];
+  /** 가장 최근 기록 기준으로 통증이 연속해서 높아진 횟수 */
+  risingCount: number;
+  /** 가장 최근 기록 기준으로 통증이 연속해서 낮아진 횟수 */
+  fallingCount: number;
+}
+
+/**
+ * 한 운동의 기록(운동 후 통증의 흐름)을 보고 상태를 정한다. 판단 순서는 안전한 쪽이 먼저다.
+ * 1) 가장 최근 기록의 운동 전·후 통증이 6점 이상 → consult
+ * 2) 통증이 3번 연속 높아짐 → consult
+ * 3) 1~2번 높아짐 → rising(지켜보기)
+ * 4) 기록이 2개 미만 → need-more
+ * 5) 2번 연속 낮아짐 → improving
+ * 6) 그 밖 → steady
+ */
+export function analyzeTrend(entriesOfOneExercise: LogEntry[]): Trend {
+  const list = [...entriesOfOneExercise].sort((a, b) => a.at - b.at);
+  const pains = list.map((e) => e.pain);
+  let rising = 0;
+  for (let i = pains.length - 1; i > 0 && pains[i] > pains[i - 1]; i--) rising++;
+  let falling = 0;
+  for (let i = pains.length - 1; i > 0 && pains[i] < pains[i - 1]; i--) falling++;
+  const base = { risingCount: rising, fallingCount: falling };
+
+  if (list.length === 0) return { status: "need-more", reasons: [], ...base };
+
+  const latest = list[list.length - 1];
+  const reasons: string[] = [];
+  if (shouldAdviseStop(latest.pain) || shouldAdviseStop(latest.painBefore ?? 0)) {
+    reasons.push(`가장 최근 기록에서 통증이 ${PAIN_BLOCK_THRESHOLD}점 이상이에요.`);
+  }
+  if (rising >= RISING_CONSULT_COUNT) {
+    reasons.push(`운동 후 통증이 ${rising}번 연속 높아졌어요.`);
+  }
+  if (reasons.length > 0) return { status: "consult", reasons, ...base };
+
+  if (rising >= 1) return { status: "rising", reasons: [`운동 후 통증이 ${rising}번 연속 높아졌어요.`], ...base };
+  if (list.length < 2) return { status: "need-more", reasons: [], ...base };
+  if (falling >= FALLING_IMPROVE_COUNT) {
+    return { status: "improving", reasons: [`운동 후 통증이 ${falling}번 연속 낮아졌어요.`], ...base };
+  }
+  return { status: "steady", reasons: [], ...base };
+}
+
+/** 통증이 줄어드는 흐름(improving)인 운동의 번호들. 다음 추천에서 앞쪽에 보여 줄 때 쓴다. */
+export function improvingExerciseIds(entries: LogEntry[]): string[] {
+  const ids = [...new Set(entries.map((e) => e.exerciseId))];
+  return ids.filter((id) => analyzeTrend(entriesFor(entries, id)).status === "improving");
 }
