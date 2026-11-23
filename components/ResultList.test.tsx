@@ -3,10 +3,10 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { EXERCISES } from "../lib/exercises/data";
 import { BLOCK_MESSAGES, NOTICE_NOT_MEDICAL, NOTICE_PROTOTYPE, RESULT_MESSAGES } from "../lib/notices";
-import { ResultList } from "./ResultList";
+import { ResultList, commonStopCriteria } from "./ResultList";
 
 const render = (result: Parameters<typeof ResultList>[0]["result"]) =>
-  renderToStaticMarkup(<ResultList result={result} />);
+  renderToStaticMarkup(<ResultList result={result} onBack={() => {}} />);
 
 describe("추천 결과 화면", () => {
   it("모든 운동에 방법·횟수·세트·주의사항·중단 기준이 보인다", () => {
@@ -19,6 +19,14 @@ describe("추천 결과 화면", () => {
       for (const s of e.steps) expect(html).toContain(s);
       for (const c of e.cautions) expect(html).toContain(c);
     }
+  });
+
+  it("모든 운동에 같은 중단 기준은 한 번만 보인다", () => {
+    const list = EXERCISES.slice(0, 3);
+    const common = commonStopCriteria(list);
+    expect(common.length).toBeGreaterThan(0);
+    const html = render({ status: "ok", exercises: list });
+    for (const c of common) expect(html.split(c).length - 1).toBe(1);
   });
 
   it("공통 안내 2종이 결과 아래에 보인다", () => {

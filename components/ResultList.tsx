@@ -14,7 +14,22 @@ import type { RecommendResponse } from "../lib/recommend";
 /** 서버가 보낸 결과 + 서버에 닿지 못한 경우 */
 export type ResultView = RecommendResponse | { status: "network-error" };
 
-function ExerciseCard({ exercise, index }: { exercise: Exercise; index: number }) {
+/** 추천된 모든 운동에 똑같이 들어 있는 중단 기준(한 번만 보여 준다) */
+export function commonStopCriteria(exercises: Exercise[]): string[] {
+  if (exercises.length === 0) return [];
+  return exercises[0].stopCriteria.filter((c) => exercises.every((e) => e.stopCriteria.includes(c)));
+}
+
+function ExerciseCard({
+  exercise,
+  index,
+  common,
+}: {
+  exercise: Exercise;
+  index: number;
+  common: string[];
+}) {
+  const extraStops = exercise.stopCriteria.filter((c) => !common.includes(c));
   return (
     <li className="rounded-3xl bg-surface p-5 ring-1 ring-line sm:p-6">
       <div className="flex items-start gap-3">
@@ -53,14 +68,16 @@ function ExerciseCard({ exercise, index }: { exercise: Exercise; index: number }
         </ul>
       </div>
 
-      <div className="mt-4 rounded-2xl bg-notice-bg px-4 py-3 text-sm leading-6">
-        <h5 className="font-semibold">이럴 땐 멈추세요</h5>
-        <ul className="mt-1 flex list-disc flex-col gap-0.5 pl-5">
-          {exercise.stopCriteria.map((criterion) => (
-            <li key={criterion}>{criterion}</li>
-          ))}
-        </ul>
-      </div>
+      {extraStops.length > 0 ? (
+        <div className="mt-4 rounded-2xl bg-notice-bg px-4 py-3 text-sm leading-6">
+          <h5 className="font-semibold">이 운동은 특히</h5>
+          <ul className="mt-1 flex list-disc flex-col gap-0.5 pl-5">
+            {extraStops.map((criterion) => (
+              <li key={criterion}>{criterion}</li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
     </li>
   );
 }
@@ -69,16 +86,29 @@ function Message({ children }: { children: ReactNode }) {
   return <p className="rounded-3xl bg-surface p-5 leading-7 ring-1 ring-line">{children}</p>;
 }
 
-export function ResultList({ result }: { result: ResultView }) {
+export function ResultList({ result, onBack }: { result: ResultView; onBack: () => void }) {
   let content: ReactNode;
+  const common = result.status === "ok" ? commonStopCriteria(result.exercises) : [];
   switch (result.status) {
     case "ok":
       content = (
+        <>
+        {common.length > 0 ? (
+          <div className="mb-4 rounded-3xl bg-notice-bg p-5 text-sm leading-6">
+            <h4 className="font-semibold">모든 운동 공통 · 이럴 땐 멈추세요</h4>
+            <ul className="mt-1.5 flex list-disc flex-col gap-1 pl-5">
+              {common.map((criterion) => (
+                <li key={criterion}>{criterion}</li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
         <ul className="flex flex-col gap-4">
           {result.exercises.map((exercise, i) => (
-            <ExerciseCard key={exercise.id} exercise={exercise} index={i} />
+            <ExerciseCard key={exercise.id} exercise={exercise} index={i} common={common} />
           ))}
         </ul>
+        </>
       );
       break;
     case "blocked":
@@ -109,14 +139,30 @@ export function ResultList({ result }: { result: ResultView }) {
   }
 
   return (
-    <section aria-labelledby="result-heading" className="flex flex-col gap-4">
-      <h3 id="result-heading" className="scroll-mt-16 text-xl font-semibold">
-        {result.status === "ok" ? "추천 운동" : "안내"}
-      </h3>
-      <div role="status">{content}</div>
-      <p className="text-center text-xs leading-5 text-muted">
-        {NOTICE_NOT_MEDICAL} · {NOTICE_PROTOTYPE}
-      </p>
+    <section
+      aria-labelledby="step-heading"
+      className="flex flex-1 flex-col items-center px-4 pb-12 pt-[clamp(56px,8vh,88px)]"
+    >
+      <div className="flex w-full max-w-[760px] flex-col gap-5">
+        <h2
+          id="step-heading"
+          tabIndex={-1}
+          className="text-center text-[clamp(28px,3.6vw,44px)] font-medium leading-[1.12] tracking-[-0.03em] outline-none"
+        >
+          {result.status === "ok" ? "추천 운동" : "안내"}
+        </h2>
+        <div role="status">{content}</div>
+        <button
+          type="button"
+          onClick={onBack}
+          className="self-center rounded-full px-5 py-3 text-sm font-medium text-muted ring-1 ring-line transition hover:text-foreground hover:ring-foreground/30"
+        >
+          ← 다시 입력하기
+        </button>
+        <p className="text-center text-xs leading-5 text-muted">
+          {NOTICE_NOT_MEDICAL} · {NOTICE_PROTOTYPE}
+        </p>
+      </div>
     </section>
   );
 }

@@ -17,12 +17,13 @@ import { HeroStep } from "./HeroStep";
 import { ResultList, type ResultView } from "./ResultList";
 import { TypeStep } from "./TypeStep";
 
-type Step = "hero" | "type" | "details";
+type Step = "hero" | "type" | "details" | "result";
 
 const STEP_TO_HANDS: Record<Step, HandsMode> = {
   hero: "hero",
   type: "type",
   details: "details",
+  result: "details",
 };
 
 /** 나가는 화면이 사라지는 시간(밀리초). globals.css의 step-out 시간과 같다. */
@@ -50,13 +51,6 @@ export function Flow() {
     document.getElementById("step-heading")?.focus({ preventScroll: true });
     window.scrollTo({ top: 0 });
   }, [step]);
-
-  // 결과가 나오면 화면 안으로 부드럽게 옮겨 보여 준다.
-  useEffect(() => {
-    if (result) {
-      document.getElementById("result-heading")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  }, [result]);
 
   useEffect(
     () => () => {
@@ -126,6 +120,7 @@ export function Flow() {
     const safety = judgeSafety(checked.request);
     if (safety.status === "blocked") {
       setResult({ status: "blocked", reason: safety.reason });
+      go("result");
       return;
     }
 
@@ -138,8 +133,10 @@ export function Flow() {
         body: JSON.stringify(checked.request),
       });
       setResult((await response.json()) as RecommendResponse);
+      go("result");
     } catch {
       setResult({ status: "network-error" });
+      go("result");
     } finally {
       setPending(false);
     }
@@ -165,23 +162,20 @@ export function Flow() {
         ) : null}
 
         {step === "details" ? (
-          <>
-            <DetailsStep
-              intake={intake}
-              issues={issues}
-              pending={pending}
-              onChange={change}
-              onTogglePart={togglePart}
-              onSubmit={submit}
-              onBack={() => go("type")}
-              onChangeType={() => go("type")}
-            />
-            {result ? (
-              <div className="mx-auto -mt-4 w-full max-w-[760px] px-4 pb-12">
-                <ResultList result={result} />
-              </div>
-            ) : null}
-          </>
+          <DetailsStep
+            intake={intake}
+            issues={issues}
+            pending={pending}
+            onChange={change}
+            onTogglePart={togglePart}
+            onSubmit={submit}
+            onBack={() => go("type")}
+            onChangeType={() => go("type")}
+          />
+        ) : null}
+
+        {step === "result" && result ? (
+          <ResultList result={result} onBack={() => go("details")} />
         ) : null}
       </div>
     </main>
