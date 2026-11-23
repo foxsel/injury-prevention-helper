@@ -108,37 +108,33 @@ export function shouldAdviseStop(pain: number): boolean {
   return pain >= PAIN_BLOCK_THRESHOLD;
 }
 
-/** 같은 운동의 바로 이전 기록 통증. 없으면 null. */
-export function previousPain(entries: LogEntry[], entry: LogEntry): number | null {
-  const earlier = entries
-    .filter((e) => e.exerciseId === entry.exerciseId && e.at < entry.at)
-    .sort((a, b) => b.at - a.at);
-  return earlier.length > 0 ? earlier[0].pain : null;
+/** 기록 첫 화면에 한 운동당 한 줄만 보여 주기 위한 요약 */
+export interface ExerciseSummary {
+  exerciseId: string;
+  /** 이 운동의 기록 개수 */
+  count: number;
+  /** 가장 최근 기록한 날(YYYY-MM-DD) */
+  lastDate: string;
 }
 
-/** 이전 기록과 비교한 문장. 좋아졌다·나빠졌다 같은 판단 없이 숫자 차이만 알려 준다. */
-export function describeChange(current: number, previous: number | null): string {
-  if (previous === null) return "첫 기록";
-  const diff = current - previous;
-  if (diff === 0) return "지난 기록과 같음";
-  return diff > 0 ? `지난 기록보다 ${diff}점 높음` : `지난 기록보다 ${-diff}점 낮음`;
-}
-
-export interface LogDay {
-  date: string;
-  entries: LogEntry[];
-}
-
-/** 날짜별로 묶는다. 최근 날짜가 위, 같은 날은 최근 기록이 위. */
-export function groupByDate(entries: LogEntry[]): LogDay[] {
-  const sorted = [...entries].sort((a, b) => b.at - a.at);
-  const days: LogDay[] = [];
-  for (const entry of sorted) {
-    const last = days[days.length - 1];
-    if (last && last.date === entry.date) last.entries.push(entry);
-    else days.push({ date: entry.date, entries: [entry] });
+/** 운동별로 하나씩 묶는다. 가장 최근에 기록한 운동이 위에 온다. */
+export function summarizeByExercise(entries: LogEntry[]): ExerciseSummary[] {
+  const byExercise = new Map<string, { count: number; lastDate: string; lastAt: number }>();
+  for (const entry of entries) {
+    const current = byExercise.get(entry.exerciseId);
+    if (!current) {
+      byExercise.set(entry.exerciseId, { count: 1, lastDate: entry.date, lastAt: entry.at });
+    } else {
+      current.count += 1;
+      if (entry.at >= current.lastAt) {
+        current.lastAt = entry.at;
+        current.lastDate = entry.date;
+      }
+    }
   }
-  return days;
+  return [...byExercise.entries()]
+    .sort((a, b) => b[1].lastAt - a[1].lastAt)
+    .map(([exerciseId, v]) => ({ exerciseId, count: v.count, lastDate: v.lastDate }));
 }
 
 // ---- 통증 변화 분석 ----

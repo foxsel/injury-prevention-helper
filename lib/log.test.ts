@@ -4,15 +4,13 @@ import { PAIN_BLOCK_THRESHOLD } from "./constants";
 import {
   MAX_LOG_ENTRIES,
   addEntry,
-  describeChange,
-  groupByDate,
   localDate,
   makeEntry,
   parseLog,
-  previousPain,
   removeEntry,
   serializeLog,
   shouldAdviseStop,
+  summarizeByExercise,
 } from "./log";
 import { FORBIDDEN_TERMS } from "./constants";
 import { LOG_MESSAGES } from "./notices";
@@ -91,30 +89,29 @@ describe("기록 만들기·저장 글자", () => {
   });
 });
 
-describe("통증 변화와 날짜별 묶음", () => {
+describe("운동별 요약(기록 첫 화면)", () => {
   const e1 = makeEntry("a", 0, 5, at("2026-11-21T09:00:00"));
-  const e2 = makeEntry("a", 0, 3, at("2026-11-22T09:00:00"));
-  const e3 = makeEntry("b", 0, 7, at("2026-11-22T10:00:00"));
-  const e4 = makeEntry("a", 0, 3, at("2026-11-23T09:00:00"));
-  const all = [e1, e2, e3, e4];
+  const e2 = makeEntry("b", 0, 7, at("2026-11-22T10:00:00"));
+  const e3 = makeEntry("a", 0, 3, at("2026-11-23T09:00:00"));
+  const e4 = makeEntry("a", 0, 2, at("2026-11-23T18:00:00"));
 
-  it("같은 운동의 바로 이전 기록과 비교한다", () => {
-    expect(previousPain(all, e1)).toBeNull();
-    expect(previousPain(all, e2)).toBe(5);
-    expect(previousPain(all, e3)).toBeNull();
-    expect(previousPain(all, e4)).toBe(3);
+  it("같은 운동은 하나로 묶고 기록 개수와 가장 최근 날짜를 알려 준다", () => {
+    const list = summarizeByExercise([e1, e2, e3, e4]);
+    expect(list).toHaveLength(2);
+    expect(list.find((x) => x.exerciseId === "a")).toEqual({ exerciseId: "a", count: 3, lastDate: "2026-11-23" });
+    expect(list.find((x) => x.exerciseId === "b")).toEqual({ exerciseId: "b", count: 1, lastDate: "2026-11-22" });
   });
 
-  it("변화 문장은 숫자 차이만 말하고 판단하지 않는다", () => {
-    expect(describeChange(5, null)).toBe("첫 기록");
-    expect(describeChange(3, 5)).toBe("지난 기록보다 2점 낮음");
-    expect(describeChange(6, 4)).toBe("지난 기록보다 2점 높음");
-    expect(describeChange(4, 4)).toBe("지난 기록과 같음");
+  it("가장 최근에 기록한 운동이 위에 온다", () => {
+    expect(summarizeByExercise([e1, e2]).map((x) => x.exerciseId)).toEqual(["b", "a"]);
+    expect(summarizeByExercise([e1, e2, e3]).map((x) => x.exerciseId)).toEqual(["a", "b"]);
   });
 
-  it("날짜별로 묶고 최근 날짜·최근 기록이 위에 온다", () => {
-    const days = groupByDate(all);
-    expect(days.map((d) => d.date)).toEqual(["2026-11-23", "2026-11-22", "2026-11-21"]);
-    expect(days[1].entries.map((e) => e.exerciseId)).toEqual(["b", "a"]);
+  it("기록 순서가 섞여 들어와도 가장 최근 날짜를 고른다", () => {
+    expect(summarizeByExercise([e4, e1, e3])[0].lastDate).toBe("2026-11-23");
+  });
+
+  it("기록이 없으면 빈 목록", () => {
+    expect(summarizeByExercise([])).toEqual([]);
   });
 });

@@ -1,16 +1,16 @@
 "use client";
 
-// Design Ref: PRD nice "진행 기록 화면" — 운동 하나의 통증 증감 그래프와 분석.
+// Design Ref: PRD nice "진행 기록 화면" — 운동 하나의 기록 날짜, 통증 증감 그래프와 분석. 기록을 하나씩 지울 수도 있다.
 // Plan SC: 3번 연속 높아지거나 6점 이상이면 병원 진료 제안, 줄어들면 이 운동을 추천에서 더 앞에 보여 준다.
 
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { EXERCISES } from "../lib/exercises/data";
-import { analyzeTrend, entriesFor, type TrendStatus } from "../lib/log";
+import { analyzeTrend, entriesFor, removeEntry, type TrendStatus } from "../lib/log";
 import { effectMessage, LOG_MESSAGES, TREND_MESSAGES } from "../lib/notices";
 import { Card } from "./Card";
 import { PainChart } from "./PainChart";
-import { useLog } from "./logStore";
+import { saveLog, useLog } from "./logStore";
 
 const HEADLINES: Record<TrendStatus, string> = {
   consult: "병원 진료를 권해요",
@@ -33,7 +33,8 @@ function Legend({ children }: { children: ReactNode }) {
 }
 
 export function ExerciseLogView({ exerciseId }: { exerciseId: string }) {
-  const entries = entriesFor(useLog(), exerciseId);
+  const allEntries = useLog();
+  const entries = entriesFor(allEntries, exerciseId);
   const exercise = EXERCISES.find((e) => e.id === exerciseId);
   const name = exercise?.name ?? "알 수 없는 운동";
   const trend = analyzeTrend(entries);
@@ -112,13 +113,16 @@ export function ExerciseLogView({ exerciseId }: { exerciseId: string }) {
 
           {/* 숫자 표: 그래프를 볼 수 없는 경우에도 같은 내용을 읽을 수 있게 */}
           <div className="mt-6 overflow-x-auto rounded-3xl bg-surface ring-1 ring-line">
-            <table className="w-full min-w-[320px] text-left text-sm">
+            <table className="w-full min-w-[360px] text-left text-sm">
               <caption className="sr-only">{name} 기록</caption>
               <thead className="text-xs text-muted">
                 <tr>
                   <th scope="col" className="px-5 py-3 font-medium">날짜</th>
                   <th scope="col" className="px-3 py-3 font-medium">운동 전</th>
                   <th scope="col" className="px-3 py-3 font-medium">운동 후</th>
+                  <th scope="col" className="px-3 py-3 text-right font-medium">
+                    <span className="sr-only">기록 지우기</span>
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -129,6 +133,16 @@ export function ExerciseLogView({ exerciseId }: { exerciseId: string }) {
                       {e.painBefore === undefined ? "–" : `${e.painBefore}점`}
                     </td>
                     <td className="px-3 py-3 font-semibold tabular-nums">{e.pain}점</td>
+                    <td className="px-3 py-3 text-right">
+                      <button
+                        type="button"
+                        aria-label={`${e.date} 기록 지우기`}
+                        onClick={() => saveLog(removeEntry(allEntries, e.id))}
+                        className="rounded-full px-3 py-1.5 text-xs font-medium text-muted ring-1 ring-line transition hover:text-foreground"
+                      >
+                        지우기
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
