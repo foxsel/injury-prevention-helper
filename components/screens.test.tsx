@@ -131,6 +131,14 @@ describe("처음 화면(공통 틀 + 시작 화면)", () => {
   });
 });
 
+describe("왼쪽 위 [처음으로]·[참고] 버튼", () => {
+  it("공통 틀에 [처음으로] 링크와 [참고] 버튼이 함께 있다", () => {
+    const html = fullPage();
+    expect(html).toMatch(/<a[^>]*href="\/"[^>]*>(?:<span[^>]*>⌂<\/span>)?처음으로<\/a>/);
+    expect(textOf(html)).toContain("참고");
+  });
+});
+
 describe("시작 화면", () => {
   it("[시작하기]는 눌러서 쓰는 버튼이다", () => {
     const html = renderToStaticMarkup(<HeroStep onStart={noop} />);

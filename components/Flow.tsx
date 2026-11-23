@@ -10,6 +10,7 @@ import type { HandsMode } from "../lib/dotMatrix";
 import { EMPTY_INTAKE, validateIntake, type IntakeState } from "../lib/intake";
 import type { RecommendResponse } from "../lib/recommend";
 import { judgeSafety } from "../lib/safety";
+import { consumeStart, START_EVENT } from "../lib/startSignal";
 import type { RecommendRequest, ValidationIssue } from "../lib/validate";
 import { DetailsStep } from "./DetailsStep";
 import { DotHands } from "./DotHands";
@@ -51,6 +52,30 @@ export function Flow() {
     document.getElementById("step-heading")?.focus({ preventScroll: true });
     window.scrollTo({ top: 0 });
   }, [step]);
+
+  /** 첫 화면으로 돌아간다: 고른 값과 결과를 모두 지운다. */
+  function resetAll() {
+    if (timer.current) clearTimeout(timer.current);
+    setLeaving(false);
+    setStep("hero");
+    setIntake(EMPTY_INTAKE);
+    setIssues([]);
+    setResult(null);
+    setPending(false);
+  }
+
+  // [처음으로] 신호: 이 화면이 보이는 중이면 이벤트로 받고, 다른 화면에서 돌아왔을 때는 표시로 확인한다.
+  useEffect(() => {
+    const onStart = () => {
+      consumeStart();
+      resetAll();
+    };
+    window.addEventListener(START_EVENT, onStart);
+    queueMicrotask(() => {
+      if (consumeStart()) resetAll();
+    });
+    return () => window.removeEventListener(START_EVENT, onStart);
+  }, []);
 
   useEffect(
     () => () => {

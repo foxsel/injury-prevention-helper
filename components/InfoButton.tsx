@@ -30,7 +30,7 @@ export function InfoButton() {
   }, [open]);
 
   return (
-    <div ref={wrapRef} className="fixed left-4 top-4 z-30">
+    <div ref={wrapRef}>
       <button
         type="button"
         aria-expanded={open}
@@ -44,7 +44,7 @@ export function InfoButton() {
       <div
         id={panelId}
         hidden={!open}
-        className="mt-2 w-[min(22rem,calc(100vw-2rem))] rounded-2xl bg-surface p-4 shadow-lg ring-1 ring-line"
+        className="absolute left-0 top-full mt-2 w-[min(22rem,calc(100vw-2rem))] rounded-2xl bg-surface p-4 shadow-lg ring-1 ring-line"
       >
         <p className="text-base font-bold leading-6">{SERVICE_NAME}</p>
         <p className="mt-0.5 text-sm leading-5 text-muted">{SERVICE_TAGLINE}</p>

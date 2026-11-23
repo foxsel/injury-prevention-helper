@@ -1,20 +1,15 @@
 // Design Ref: §3.2 `/guide/[id]` 가이드 화면 — 운동 하나의 방법·횟수·세트·주의사항·중단 기준.
 // Plan SC: 필수 정보가 모두 보이고, 중단 기준은 강조해서 보인다. 안내 문구 2종이 아래에 보인다.
 
-import Link from "next/link";
 import type { Exercise } from "../lib/exercises/types";
 import { NOTICE_NOT_MEDICAL, NOTICE_PROTOTYPE } from "../lib/notices";
+import { BackButton } from "./BackButton";
 import { Card } from "./Card";
 
 export function GuideView({ exercise }: { exercise: Exercise }) {
   return (
     <section className="mx-auto flex w-full max-w-[760px] flex-1 flex-col px-4 pb-12 pt-[clamp(72px,10vh,104px)]">
-      <Link
-        href="/"
-        className="self-start rounded-full px-5 py-3 text-sm font-medium text-muted ring-1 ring-line transition hover:text-foreground hover:ring-foreground/30"
-      >
-        ← 처음으로
-      </Link>
+      <BackButton />
 
       <header className="mt-8">
         <p className="text-sm font-medium text-faint">

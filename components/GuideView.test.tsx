@@ -19,7 +19,7 @@ describe("운동 가이드 화면", () => {
       expect(html).toContain(STOP_CRITERIA_TEXT);
       expect(html).toContain(NOTICE_NOT_MEDICAL);
       expect(html).toContain(NOTICE_PROTOTYPE);
-      expect(html).toContain('href="/"');
+      expect(html).toContain("추천 목록으로");
     }
   });
 

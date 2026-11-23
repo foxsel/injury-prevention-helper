@@ -71,11 +71,9 @@ function ExerciseCard({
 
       <Link
         href={`/guide/${exercise.id}`}
-        target="_blank"
-        rel="noopener"
         className="mt-4 inline-block text-sm font-medium underline underline-offset-4"
       >
-        가이드 따로 보기 ↗
+        가이드 따로 보기 →
       </Link>
 
       {extraStops.length > 0 ? (
