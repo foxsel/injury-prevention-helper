@@ -1,7 +1,7 @@
 "use client";
 
 // Design Ref: PRD nice "진행 기록 화면" — 기록 첫 화면: 기록한 운동을 한 운동당 한 줄로 보여 준다.
-// Plan SC: 같은 운동을 여러 번 기록해도 하나만 보이고, 부위별 탭(전체·발목·무릎·어깨)으로 나눠 보며,
+// Plan SC: 같은 운동·같은 부위를 여러 번 기록해도 하나만 보이고(부위가 다르면 따로), 부위별 탭(전체·발목·무릎·어깨)으로 나눠 보며,
 //          누르면 날짜별 기록·그래프·분석을 볼 수 있다.
 //          기록은 이 브라우저에만 있고, 모두 지울 수 있다(하나씩 지우기는 운동별 화면에서).
 
@@ -9,17 +9,13 @@ import Link from "next/link";
 import { useState, type KeyboardEvent } from "react";
 import { BODY_PARTS, type BodyPart } from "../lib/constants";
 import { EXERCISES } from "../lib/exercises/data";
-import { summariesForPart, summarizeByExercise } from "../lib/log";
+import { logHref, summariesForPart, summarizeByExercisePart } from "../lib/log";
 import { LOG_MESSAGES } from "../lib/notices";
 import { Card } from "./Card";
 import { saveLog, useLog } from "./logStore";
 
 function nameOf(exerciseId: string): string {
   return EXERCISES.find((e) => e.id === exerciseId)?.name ?? "알 수 없는 운동";
-}
-
-function partsOf(exerciseId: string): BodyPart[] {
-  return EXERCISES.find((e) => e.id === exerciseId)?.bodyParts ?? [];
 }
 
 /** 탭 이름: null은 전체 */
@@ -31,8 +27,8 @@ export function LogView() {
   const entries = useLog();
   const [confirmingClear, setConfirmingClear] = useState(false);
   const [tab, setTab] = useState<Tab>(null);
-  const summaries = summarizeByExercise(entries);
-  const shown = summariesForPart(summaries, tab, partsOf);
+  const summaries = summarizeByExercisePart(entries);
+  const shown = summariesForPart(summaries, tab);
 
   // 탭에서 ← → 키로 옆 탭으로 옮긴다.
   function onTabKey(event: KeyboardEvent<HTMLButtonElement>, index: number) {
@@ -60,7 +56,7 @@ export function LogView() {
             {/* 부위별 탭: 전체 / 발목 / 무릎 / 어깨 */}
             <div role="tablist" aria-label="부위별 기록" className="flex flex-wrap gap-2">
               {TABS.map((t, i) => {
-                const count = summariesForPart(summaries, t, partsOf).length;
+                const count = summariesForPart(summaries, t).length;
                 const selected = tab === t;
                 return (
                   <button
@@ -93,7 +89,7 @@ export function LogView() {
               className="mt-4"
             >
               <h2 className="text-sm font-semibold text-faint">
-                기록한 운동 {shown.length}개 · 누르면 날짜별 기록과 그래프를 볼 수 있어요
+                기록한 운동 {shown.length}개 · 같은 운동도 부위가 다르면 따로 보여요 · 누르면 날짜별 기록과 그래프를 볼 수 있어요
               </h2>
               {shown.length === 0 ? (
                 <Card className="mt-3 text-center">
@@ -102,14 +98,14 @@ export function LogView() {
               ) : (
                 <ul className="mt-3 flex flex-col gap-3">
                   {shown.map((item) => (
-                    <li key={item.exerciseId}>
+                    <li key={`${item.exerciseId}-${item.part}`}>
                       <Link
-                        href={`/log/${item.exerciseId}`}
+                        href={logHref(item.exerciseId, item.part)}
                         className="flex items-center justify-between gap-3 rounded-3xl bg-surface p-5 ring-1 ring-line transition hover:ring-foreground/30"
                       >
                         <span className="min-w-0">
                           <span className="block text-xs font-semibold tracking-[0.08em] text-faint">
-                            {partsOf(item.exerciseId).join("·") || "부위 미상"}
+                            {item.part}
                           </span>
                           <span className="mt-0.5 block font-semibold">{nameOf(item.exerciseId)}</span>
                           <span className="mt-1 block text-sm text-muted">

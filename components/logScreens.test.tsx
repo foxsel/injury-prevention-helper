@@ -3,7 +3,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { EXERCISES } from "../lib/exercises/data";
-import type { LogEntry } from "../lib/log";
+import { partSlug, type LogEntry } from "../lib/log";
 import { TREND_MESSAGES } from "../lib/notices";
 import { ExerciseLogView } from "./ExerciseLogView";
 import { PainChart } from "./PainChart";
@@ -14,6 +14,7 @@ function entry(i: number, pain: number, painBefore?: number): LogEntry {
   return {
     id: `e${i}`,
     exerciseId: "x",
+    part: "발목",
     date: `2026-11-${String(10 + i).padStart(2, "0")}`,
     ...(painBefore === undefined ? {} : { painBefore }),
     pain,
@@ -51,20 +52,39 @@ describe("통증 그래프", () => {
 
 describe("운동별 기록 화면", () => {
   it("기록이 없으면 안내와 돌아가기가 보인다", () => {
-    const html = renderToStaticMarkup(<ExerciseLogView exerciseId={EXERCISES[0].id} />);
+    const html = renderToStaticMarkup(<ExerciseLogView exerciseId={EXERCISES[0].id} part={EXERCISES[0].bodyParts[0]} />);
     expect(html).toContain(EXERCISES[0].name);
     expect(html).toContain("아직 기록이 없어요");
     expect(html).toContain("기록으로");
     expect(html).toContain("브라우저에만 저장");
+    expect(html).toContain(EXERCISES[0].bodyParts[0]);
+  });
+});
+
+describe("여러 부위를 다루는 운동의 기록 카드", () => {
+  const multi = EXERCISES.find((x) => x.bodyParts.length > 1);
+
+  it("어느 부위의 통증인지 고르는 칸이 보인다", () => {
+    expect(multi).toBeDefined();
+    const html = renderToStaticMarkup(<RecordCard exerciseId={multi!.id} bodyParts={multi!.bodyParts} />);
+    expect(html).toContain("어느 부위의 통증을 기록하나요?");
+    expect((html.match(/name="record-part"/g) ?? []).length).toBe(multi!.bodyParts.length);
+    expect(html).toContain("부위가 다르면 기록과 그래프가 따로 만들어져요");
+  });
+
+  it("부위가 하나뿐인 운동에는 고르는 칸이 없다", () => {
+    const single = EXERCISES.find((x) => x.bodyParts.length === 1)!;
+    const html = renderToStaticMarkup(<RecordCard exerciseId={single.id} bodyParts={single.bodyParts} />);
+    expect(html).not.toContain("어느 부위의 통증을 기록하나요?");
   });
 });
 
 describe("기록 카드", () => {
   it("추천을 거치지 않은 첫 기록이면 운동 전·후 통증 슬라이더가 둘 다 보인다", () => {
-    const html = renderToStaticMarkup(<RecordCard exerciseId={EXERCISES[0].id} />);
+    const html = renderToStaticMarkup(<RecordCard exerciseId={EXERCISES[0].id} bodyParts={EXERCISES[0].bodyParts} />);
     expect((html.match(/type="range"/g) ?? []).length).toBe(2);
     expect(html).toContain("추천을 거치지 않고 처음 기록하는 운동");
-    expect(html).toContain(`/log/${EXERCISES[0].id}`);
+    expect(html).toContain(`/log/${EXERCISES[0].id}/${partSlug(EXERCISES[0].bodyParts[0])}`);
   });
 });
 

@@ -5,6 +5,7 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
+import type { BodyPart } from "../lib/constants";
 import { EXERCISES } from "../lib/exercises/data";
 import { analyzeTrend, entriesFor, removeEntry, type TrendStatus } from "../lib/log";
 import { effectMessage, LOG_MESSAGES, TREND_MESSAGES } from "../lib/notices";
@@ -32,9 +33,9 @@ function Legend({ children }: { children: ReactNode }) {
   return <span className="inline-flex items-center gap-2">{children}</span>;
 }
 
-export function ExerciseLogView({ exerciseId }: { exerciseId: string }) {
+export function ExerciseLogView({ exerciseId, part }: { exerciseId: string; part: BodyPart }) {
   const allEntries = useLog();
-  const entries = entriesFor(allEntries, exerciseId);
+  const entries = entriesFor(allEntries, exerciseId, part);
   const exercise = EXERCISES.find((e) => e.id === exerciseId);
   const name = exercise?.name ?? "알 수 없는 운동";
   const trend = analyzeTrend(entries);
@@ -50,10 +51,10 @@ export function ExerciseLogView({ exerciseId }: { exerciseId: string }) {
       </Link>
 
       <h1 className="mt-8 text-[clamp(30px,4vw,48px)] font-extrabold leading-[1.12] tracking-[-0.03em]">
-        {name}
+        {name} <span className="font-semibold text-muted">· {part}</span>
       </h1>
       <p className="mt-3 text-sm text-muted">
-        {exercise ? `${exercise.bodyParts.join("·")} · ` : ""}기록 {entries.length}번 ·{" "}
+        {part} · 기록 {entries.length}번 ·{" "}
         <Link href={`/guide/${exerciseId}`} className="underline underline-offset-4">
           운동 가이드 보기
         </Link>
@@ -114,7 +115,7 @@ export function ExerciseLogView({ exerciseId }: { exerciseId: string }) {
           {/* 숫자 표: 그래프를 볼 수 없는 경우에도 같은 내용을 읽을 수 있게 */}
           <div className="mt-6 overflow-x-auto rounded-3xl bg-surface ring-1 ring-line">
             <table className="w-full min-w-[360px] text-left text-sm">
-              <caption className="sr-only">{name} 기록</caption>
+              <caption className="sr-only">{name} {part} 기록</caption>
               <thead className="text-xs text-muted">
                 <tr>
                   <th scope="col" className="px-5 py-3 font-medium">날짜</th>

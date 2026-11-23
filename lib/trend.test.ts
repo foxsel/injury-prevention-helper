@@ -2,6 +2,7 @@
 import { describe, expect, it } from "vitest";
 import { FORBIDDEN_TERMS, MAX_RECOMMENDATIONS } from "./constants";
 import { EXERCISES } from "./exercises/data";
+import type { BodyPart } from "./constants";
 import type { RecommendRequest } from "./validate";
 import { boostImproving, MAX_BOOSTED, safeCandidates } from "./boost";
 import {
@@ -18,12 +19,13 @@ import { effectMessage, TREND_MESSAGES } from "./notices";
 
 let clock = 0;
 /** 시험용 기록: 호출할 때마다 시각이 1분씩 늦어진다. */
-function e(exerciseId: string, pain: number, painBefore?: number): LogEntry {
+function e(exerciseId: string, pain: number, painBefore?: number, part: BodyPart = "발목"): LogEntry {
   clock += 60_000;
   const at = new Date(2026, 10, 1).getTime() + clock;
   return {
     id: `${at}-${exerciseId}`,
     exerciseId,
+    part,
     date: "2026-11-01",
     ...(painBefore === undefined ? {} : { painBefore }),
     pain,
@@ -168,21 +170,66 @@ describe("처음 운동 전 통증과 최근 운동 후 통증 비교(효과 분
   });
 });
 
+describe("같은 운동이어도 부위가 다르면 따로 본다", () => {
+  const list = [
+    e("a", 2, 2, "발목"),
+    e("a", 4, 4, "무릎"),
+    e("a", 1, 2, "발목"),
+    e("a", 6, 6, "무릎"),
+  ];
+
+  it("한 운동·한 부위의 기록만 고른다", () => {
+    expect(entriesFor(list, "a", "발목").map((x) => x.pain)).toEqual([2, 1]);
+    expect(entriesFor(list, "a", "무릎").map((x) => x.pain)).toEqual([4, 6]);
+    expect(entriesFor(list, "a", "어깨")).toEqual([]);
+  });
+
+  it("지난 운동 후 통증도 부위별이다", () => {
+    expect(lastPainAfter(list, "a", "발목")).toBe(1);
+    expect(lastPainAfter(list, "a", "무릎")).toBe(6);
+    expect(lastPainAfter(list, "a", "어깨")).toBeNull();
+  });
+
+  it("분석도 부위별이다(발목은 문제 없고 무릎은 6점 이상이라 진료 제안)", () => {
+    expect(analyzeTrend(entriesFor(list, "a", "발목")).status).not.toBe("consult");
+    expect(analyzeTrend(entriesFor(list, "a", "무릎")).status).toBe("consult");
+  });
+
+  it("추천 앞쪽 배치는 이번에 고른 부위의 기록만 본다", () => {
+    const mixed = [
+      ...[5, 4, 3].map((p) => e("g", p, 1, "발목")),
+      ...[3, 3, 3].map((p) => e("g", p, 1, "무릎")),
+    ];
+    expect(improvingExerciseIds(mixed, ["발목"])).toEqual(["g"]);
+    expect(improvingExerciseIds(mixed, ["무릎"])).toEqual([]);
+    expect(improvingExerciseIds(mixed)).toEqual(["g"]);
+  });
+
+  it("같은 운동의 서로 다른 부위 기록을 섞어 분석하지 않는다(발목 좋아짐 + 무릎 나빠짐이 서로를 가리지 않는다)", () => {
+    const mixed = [
+      ...[5, 4, 3].map((p) => e("g", p, 1, "발목")),
+      ...[1, 2, 3, 4].map((p) => e("g", p, 1, "무릎")),
+    ];
+    expect(analyzeTrend(entriesFor(mixed, "g", "발목")).status).toBe("improving");
+    expect(analyzeTrend(entriesFor(mixed, "g", "무릎")).status).toBe("consult");
+  });
+});
+
 describe("운동별 기록 고르기와 지난 운동 후 통증", () => {
   const all = [e("a", 3, 2), e("b", 4, 5), e("a", 2, 4)];
 
   it("한 운동의 기록만 시간 순서로 고른다", () => {
-    expect(entriesFor(all, "a").map((x) => x.pain)).toEqual([3, 2]);
+    expect(entriesFor(all, "a", "발목").map((x) => x.pain)).toEqual([3, 2]);
   });
 
   it("가장 최근 운동 후 통증을 돌려주고, 기록이 없으면 null", () => {
-    expect(lastPainAfter(all, "a")).toBe(2);
-    expect(lastPainAfter(all, "b")).toBe(4);
-    expect(lastPainAfter(all, "zzz")).toBeNull();
+    expect(lastPainAfter(all, "a", "발목")).toBe(2);
+    expect(lastPainAfter(all, "b", "발목")).toBe(4);
+    expect(lastPainAfter(all, "zzz", "발목")).toBeNull();
   });
 
   it("운동 전 통증이 없는 옛 기록이어도 운동 후 통증으로 비교할 수 있다", () => {
-    expect(lastPainAfter([e("a", 3), e("a", 5)], "a")).toBe(5);
+    expect(lastPainAfter([e("a", 3), e("a", 5)], "a", "발목")).toBe(5);
   });
 
   it("운동 전 통증이 없는 옛 기록도 읽을 수 있고, 범위 밖 값은 버린다", () => {

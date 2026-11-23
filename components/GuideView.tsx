@@ -55,7 +55,7 @@ export function GuideView({ exercise }: { exercise: Exercise }) {
         </div>
       </Card>
 
-      <RecordCard exerciseId={exercise.id} />
+      <RecordCard exerciseId={exercise.id} bodyParts={exercise.bodyParts} />
 
       <p className="mt-6 text-center text-xs leading-5 text-muted">
         {NOTICE_NOT_MEDICAL} · {NOTICE_PROTOTYPE}

@@ -10,7 +10,7 @@ import type { HandsMode } from "../lib/dotMatrix";
 import { EMPTY_INTAKE, validateIntake, type IntakeState } from "../lib/intake";
 import type { RecommendResponse } from "../lib/recommend";
 import { boostImproving, safeCandidates } from "../lib/boost";
-import { improvingExerciseIds, parseLog, LOG_KEY } from "../lib/log";
+import { improvingExerciseIds } from "../lib/log";
 import { judgeSafety } from "../lib/safety";
 import { consumeStart, START_EVENT } from "../lib/startSignal";
 import type { RecommendRequest, ValidationIssue } from "../lib/validate";
@@ -19,6 +19,7 @@ import { DetailsStep } from "./DetailsStep";
 import { DotHands } from "./DotHands";
 import { HeroStep } from "./HeroStep";
 import { clearIntakePain, saveIntakePain } from "./intakePainStore";
+import { readLogEntries } from "./logStore";
 import { ResultList, type ResultView } from "./ResultList";
 import { TypeStep } from "./TypeStep";
 
@@ -161,7 +162,10 @@ export function Flow() {
   /** 진행 기록에서 통증이 줄고 있는 운동을 추천 앞쪽에 올린다. 기록은 서버로 보내지 않고 이 브라우저에서만 쓴다. */
   function withBoost(data: Extract<RecommendResponse, { status: "ok" }>, request: RecommendRequest): ResultView {
     try {
-      const improving = improvingExerciseIds(parseLog(window.localStorage.getItem(LOG_KEY)));
+      const improving = improvingExerciseIds(
+        readLogEntries(),
+        request.parts.map((p) => p.part),
+      );
       if (improving.length === 0) return data;
       const { exercises, boosted } = boostImproving(data.exercises, safeCandidates(request), improving);
       return boosted.length > 0 ? { status: "ok", exercises, boosted } : data;
