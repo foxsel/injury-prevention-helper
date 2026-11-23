@@ -25,6 +25,10 @@ export const PAIN_MIN = 0;
 export const PAIN_MAX = 10;
 export const PAIN_BLOCK_THRESHOLD = 6;
 
+// 점프 같은 고충격 운동을 제외하는 통증 기준 (PRD 5번): 한 부위라도 이 점수 이상이면 제외한다.
+// 임의로 정한 값이며, 6점(추천 중단)보다 낮게 잡았다.
+export const HIGH_IMPACT_PAIN_THRESHOLD = 3;
+
 // 한 번에 추천하는 운동의 최대 개수 (PRD 5번)
 export const MAX_RECOMMENDATIONS = 5;
 

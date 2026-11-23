@@ -53,6 +53,7 @@ export const EXERCISES: Exercise[] = [
   // ── 발목 회복 (AAFP) ─────────────────────────────────────────
   {
     id: "ankle-pump-circle-01",
+    highImpact: false,
     name: "발목 펌프와 발목 원 돌리기",
     description:
       "굳은 발목을 위아래로 움직이고 돌려서 움직임 범위를 부드럽게 되찾는 가벼운 운동입니다. 아프지 않은 범위에서만 천천히 움직이는 것이 핵심입니다.",
@@ -76,6 +77,7 @@ export const EXERCISES: Exercise[] = [
   },
   {
     id: "ankle-band-resistance-01",
+    highImpact: false,
     name: "밴드 저항 발목 운동",
     description:
       "탄력 밴드의 저항을 이용해 발목을 네 방향으로 움직이며 발목 주변 근력을 키우는 운동입니다. 약한 밴드로 시작해 천천히 움직이세요.",
@@ -99,6 +101,7 @@ export const EXERCISES: Exercise[] = [
   },
   {
     id: "ankle-heel-raise-01",
+    highImpact: false,
     name: "까치발·뒤꿈치 들기",
     description:
       "발끝과 뒤꿈치로 번갈아 서서 종아리와 발목 주변의 힘을 기르는 운동입니다. 처음에는 잡을 곳을 잡고 두 발로 시작하세요.",
@@ -122,6 +125,7 @@ export const EXERCISES: Exercise[] = [
   },
   {
     id: "ankle-single-leg-balance-01",
+    highImpact: false,
     name: "한 발 서기 균형 운동",
     description:
       "한 발로 서서 흔들리는 발목을 스스로 잡아 주는 균형 감각을 되찾는 운동입니다. 눈을 감는 단계는 눈을 뜨고 안정적으로 선 다음에 하세요.",
@@ -148,6 +152,7 @@ export const EXERCISES: Exercise[] = [
   // ── 발목·무릎 예방 (FIFA 11+) ────────────────────────────────
   {
     id: "prevent-single-leg-stance-01",
+    highImpact: false,
     name: "한 발 서기(공 잡고)",
     description:
       "한 발로 서서 발목과 무릎이 흔들리지 않게 버티는 균형 훈련입니다. 무릎이 안쪽으로 꺾이지 않는 자세를 몸에 익히는 것이 핵심입니다. 익숙해지면 뒤꿈치를 살짝 들거나 공을 허리 둘레로 돌려 난이도를 올릴 수 있습니다.",
@@ -167,6 +172,7 @@ export const EXERCISES: Exercise[] = [
   },
   {
     id: "prevent-squat-toe-raise-01",
+    highImpact: false,
     name: "스쿼트와 발끝 들기",
     description:
       "무릎을 굽혔다 펴며 다리 근력과 균형을 기르는 기본 운동입니다. 상체를 곧게 앞으로 기울이고, 무릎이 안으로 꺾이지 않게 하는 것이 중요합니다.",
@@ -190,6 +196,7 @@ export const EXERCISES: Exercise[] = [
   },
   {
     id: "prevent-walking-lunge-01",
+    highImpact: false,
     name: "걷기 런지",
     description:
       "한 걸음씩 앞으로 내딛으며 다리 근력과 무릎을 조절하는 힘을 기르는 운동입니다. 앞무릎이 발끝을 넘지 않게 하는 것이 핵심입니다.",
@@ -213,6 +220,7 @@ export const EXERCISES: Exercise[] = [
   },
   {
     id: "prevent-single-leg-squat-01",
+    highImpact: false,
     name: "한 발 스쿼트",
     description:
       "한 다리로 몸을 지탱하며 무릎을 굽혔다 펴는 난이도가 높은 운동입니다. 한 발 서기와 스쿼트가 안정된 뒤에 시도하세요.",
@@ -237,6 +245,7 @@ export const EXERCISES: Exercise[] = [
   },
   {
     id: "prevent-vertical-jump-01",
+    highImpact: true,
     name: "제자리 수직 점프",
     description:
       "무릎과 발목을 충분히 굽혀 부드럽게 착지하는 법을 익히는 점프 운동입니다. 높이 뛰는 것보다 착지 자세가 중요합니다.",
@@ -262,6 +271,7 @@ export const EXERCISES: Exercise[] = [
   },
   {
     id: "prevent-lateral-single-leg-jump-01",
+    highImpact: true,
     name: "좌우 한 발 점프",
     description:
       "한 발로 옆으로 뛰어 착지하며 발목과 무릎이 안정적으로 버티도록 훈련하는 난이도가 높은 운동입니다. 두 발 점프가 편해진 뒤에 시도하세요.",

@@ -14,6 +14,8 @@ export interface Exercise {
   bodyParts: BodyPart[];
   /** 예방 운동인지 회복 운동인지 */
   purpose: Purpose;
+  /** 점프처럼 충격이 큰 운동인지. true이면 통증이 HIGH_IMPACT_PAIN_THRESHOLD점 이상일 때 추천 후보에서 뺀다. */
+  highImpact: boolean;
   /** 방법. 3~5단계 */
   steps: string[];
   /** 횟수. 예: "방향마다 10회" */
