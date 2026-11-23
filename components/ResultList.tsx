@@ -96,7 +96,21 @@ function Message({ children }: { children: ReactNode }) {
   return <p className="rounded-3xl bg-surface p-5 leading-7 ring-1 ring-line">{children}</p>;
 }
 
-export function ResultList({ result, onBack }: { result: ResultView; onBack: () => void }) {
+export function ResultList({
+  result,
+  pending = false,
+  onBack,
+  onRetry,
+}: {
+  result: ResultView;
+  pending?: boolean;
+  onBack: () => void;
+  onRetry?: () => void;
+}) {
+  // 서버 오류·지연·연결 실패는 잠시 뒤 같은 입력으로 다시 시도할 수 있다.
+  const retryable =
+    result.status === "network-error" ||
+    (result.status === "error" && result.code !== "INVALID_INPUT");
   let content: ReactNode;
   const common = result.status === "ok" ? commonStopCriteria(result.exercises) : [];
   switch (result.status) {
@@ -162,6 +176,16 @@ export function ResultList({ result, onBack }: { result: ResultView; onBack: () 
           {result.status === "ok" ? "추천 운동" : "안내"}
         </h2>
         <div role="status">{content}</div>
+        {retryable && onRetry ? (
+          <button
+            type="button"
+            onClick={onRetry}
+            disabled={pending}
+            className="self-center rounded-full bg-accent px-6 py-3 text-sm font-semibold text-on-accent transition disabled:opacity-60"
+          >
+            {pending ? "불러오는 중..." : "다시 시도"}
+          </button>
+        ) : null}
         <button
           type="button"
           onClick={onBack}

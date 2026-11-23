@@ -10,7 +10,7 @@ import type { HandsMode } from "../lib/dotMatrix";
 import { EMPTY_INTAKE, validateIntake, type IntakeState } from "../lib/intake";
 import type { RecommendResponse } from "../lib/recommend";
 import { judgeSafety } from "../lib/safety";
-import type { ValidationIssue } from "../lib/validate";
+import type { RecommendRequest, ValidationIssue } from "../lib/validate";
 import { DetailsStep } from "./DetailsStep";
 import { DotHands } from "./DotHands";
 import { HeroStep } from "./HeroStep";
@@ -125,21 +125,35 @@ export function Flow() {
     }
 
     // ③ 서버에 추천을 요청한다.
+    await requestRecommend(checked.request);
+  }
+
+  async function requestRecommend(request: RecommendRequest) {
     setPending(true);
     try {
       const response = await fetch("/api/recommend", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(checked.request),
+        body: JSON.stringify(request),
       });
       setResult((await response.json()) as RecommendResponse);
-      go("result");
     } catch {
       setResult({ status: "network-error" });
-      go("result");
     } finally {
       setPending(false);
     }
+    go("result");
+  }
+
+  /** 오류·지연 안내 화면의 [다시 시도]: 같은 입력으로 한 번 더 요청한다. */
+  async function retry() {
+    if (pending) return;
+    const checked = validateIntake(intake);
+    if (!checked.ok) {
+      go("details");
+      return;
+    }
+    await requestRecommend(checked.request);
   }
 
   return (
@@ -175,7 +189,12 @@ export function Flow() {
         ) : null}
 
         {step === "result" && result ? (
-          <ResultList result={result} onBack={() => go("details")} />
+          <ResultList
+            result={result}
+            pending={pending}
+            onBack={() => go("details")}
+            onRetry={retry}
+          />
         ) : null}
       </div>
     </main>

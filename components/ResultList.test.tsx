@@ -43,3 +43,27 @@ describe("추천 결과 화면", () => {
     expect(render({ status: "error", code: "AI_FAILED" })).toContain(RESULT_MESSAGES.aiFailed);
   });
 });
+
+describe("[다시 시도] 버튼", () => {
+  const withRetry = (result: Parameters<typeof ResultList>[0]["result"]) =>
+    renderToStaticMarkup(<ResultList result={result} onBack={() => {}} onRetry={() => {}} />);
+
+  it("AI 오류·지연·연결 실패에만 보인다", () => {
+    expect(withRetry({ status: "error", code: "AI_FAILED" })).toContain("다시 시도");
+    expect(withRetry({ status: "error", code: "AI_TIMEOUT" })).toContain("다시 시도");
+    expect(withRetry({ status: "network-error" })).toContain("다시 시도");
+  });
+
+  it("막힘·추천 없음·입력 오류에는 보이지 않는다(같은 입력으로는 결과가 같기 때문)", () => {
+    expect(withRetry({ status: "blocked", reason: "pain" })).not.toContain("다시 시도");
+    expect(withRetry({ status: "empty" })).not.toContain("다시 시도");
+    expect(withRetry({ status: "error", code: "INVALID_INPUT", issues: [] })).not.toContain("다시 시도");
+  });
+
+  it("요청 중에는 눌리지 않는다", () => {
+    const html = renderToStaticMarkup(
+      <ResultList result={{ status: "network-error" }} pending onBack={() => {}} onRetry={() => {}} />,
+    );
+    expect(html).toMatch(/<button[^>]*disabled[^>]*>불러오는 중/);
+  });
+});
