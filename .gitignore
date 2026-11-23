@@ -42,3 +42,7 @@ next-env.d.ts
 
 # 삭제 대기 폴더 (직접 확인 후 삭제)
 /trash-can/
+
+# 개발 도구 작업 기록 (커밋하지 않음)
+/.bkit/
+/.claude/

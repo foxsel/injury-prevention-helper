@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 부상 예방·회복 운동 도우미
 
-## Getting Started
+축구·농구·배구·야구·헬스를 하는 사람이 **발목·무릎·어깨**의 부상을 예방하거나 회복할 때, 종목과 통증 상태에 맞는 운동을 한곳에서 안내하는 웹앱입니다. **전문가 검토 전 시제품**이며 의료 행위를 대신하지 않습니다.
 
-First, run the development server:
+## 하는 일
+
+- **맞춤 운동 추천**: 사용 유형(예방형/회복형), 종목, 부위, 부위별 통증(0~10점)을 입력하면 미리 정리한 운동 목록에서 최대 5개를 추천합니다. 종목별로 부담이 많이 가는 부위에는 '추천' 표시가 붙습니다.
+- **운동 가이드**: 방법(3~5단계), 횟수·세트, 주의사항, 중단 기준을 보여 줍니다.
+- **진행 기록**: 운동 전·후 통증을 기록하면 운동·부위별 그래프와 분석을 보여 줍니다. 기록은 이 브라우저에만 저장되고 서버로 보내지 않습니다.
+
+## 안전 규칙 (요약)
+
+- 한 부위라도 통증 6점 이상이거나 체중을 싣기 어려우면 추천하지 않고 병원 상담을 안내합니다.
+- 통증 3점 이상이면 점프 같은 고충격 운동은 후보에서 뺍니다.
+- AI는 운동 번호만 고르고, 화면의 운동 문장은 모두 `lib/exercises/data.ts`의 목록에서만 나옵니다.
+- 진단·처방·효과 보장 표현을 쓰지 않습니다. 입력값은 서버에 저장하지 않습니다.
+
+> ⚠ 안전 기준 숫자는 임의로 정한 값이고, 어깨 예방 운동 4개는 근거 없는 **가상 샘플**입니다. 실제 공개 전에 근거 확인과 전문가 검토가 필요합니다. 자세한 내용은 [REPORT.md](REPORT.md)를 보세요.
+
+## 실행 방법
+
+Node.js가 설치되어 있어야 합니다.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev     # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+AI 추천을 쓰려면 프로젝트 폴더에 `.env` 파일을 만들고 `OPENAI_API_KEY`를 적습니다. (이 파일은 git에 올라가지 않으며, 키를 문서나 채팅에 적지 마세요.) 모델은 기본 `gpt-4.1-mini`이고 `OPENAI_MODEL`로 바꿀 수 있습니다.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| 명령 | 하는 일 |
+|------|---------|
+| `npm run dev` | 개발 서버 실행 |
+| `npm test` | 자동 시험 실행 (Vitest) |
+| `npm run lint` | 코드 검사 |
+| `npm run build` | 배포용 빌드 |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 문서
 
-## Learn More
+| 문서 | 내용 |
+|------|------|
+| [PRD.md](PRD.md) | 기획서 (문제, 기능, 안전 규칙, 범위) |
+| [PLAN.md](PLAN.md) | 계획서 (작업 순서, 성공 기준, 위험) |
+| [DESIGN.md](DESIGN.md) | 설계서 (화면, 데이터 흐름, 폴더 구조, 시험) |
+| [REPORT.md](REPORT.md) | 프로젝트 보고서 (출처, 가상 데이터를 쓴 이유, 보완 계획) |
+| [CLAUDE.md](CLAUDE.md) | AI 작업 도구가 지킬 프로젝트 규칙 |
 
-To learn more about Next.js, take a look at the following resources:
+## 기술
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Next.js 16(App Router) · React 19 · TypeScript · Tailwind CSS 4 · OpenAI SDK · zod · Vitest. 배포는 Vercel을 계획하고 있으며 아직 배포하지 않았습니다.
