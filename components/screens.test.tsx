@@ -78,10 +78,15 @@ describe("전체 화면(공통 틀 + 첫 화면)", () => {
     expect(layoutOnly).not.toContain(NOTICE_AI_TRANSMISSION);
   });
 
-  it("서비스 소개, 이용 방법, 안전 안내 영역이 있다", () => {
-    expect(html).toContain("내 상태에 맞는 부상 예방·회복 운동을 찾아보세요");
-    expect(html).toContain("이렇게 사용해요");
-    expect(html).toContain("안전하게 이용하려면");
+  it("서비스 소개, 이용 방법 3단계, 안전 안내 영역이 있다", () => {
+    // 제목 안에 강조(<span>)가 섞여 있으므로 태그를 뺀 글자로 확인한다.
+    const text = html.replace(/<[^>]*>/g, "");
+    expect(text).toContain("내 상태에 맞는 부상 예방·회복 운동을 찾아보세요");
+    expect(text).toContain("이렇게 사용해요");
+    expect(text).toContain("유형 고르기");
+    expect(text).toContain("종목·부위·통증 알려주기");
+    expect(text).toContain("추천 운동 확인하기");
+    expect(text).toContain("안전하게 이용하려면");
   });
 
   it("화면 문장에 금지 표현(진단·처방·효과 보장)이 없다", () => {

@@ -13,11 +13,17 @@ export function CommonNotices() {
     <div
       role="note"
       aria-label="이용 안내"
-      className="border-b border-amber-300 bg-amber-50 text-amber-950 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-100"
+      className="border-b border-notice-line bg-notice-bg text-notice-text"
     >
-      <ul className="mx-auto flex max-w-3xl flex-col gap-1 px-4 py-3 text-sm font-medium sm:flex-row sm:gap-6">
-        <li>{NOTICE_NOT_MEDICAL}</li>
-        <li>{NOTICE_PROTOTYPE}</li>
+      <ul className="mx-auto flex max-w-5xl flex-col gap-1 px-4 py-3 text-sm font-semibold sm:flex-row sm:gap-6">
+        <li className="flex items-center gap-2">
+          <span aria-hidden="true" className="size-1.5 rounded-full bg-accent" />
+          {NOTICE_NOT_MEDICAL}
+        </li>
+        <li className="flex items-center gap-2">
+          <span aria-hidden="true" className="size-1.5 rounded-full bg-accent" />
+          {NOTICE_PROTOTYPE}
+        </li>
       </ul>
     </div>
   );
@@ -26,11 +32,17 @@ export function CommonNotices() {
 /** 첫 화면에만 놓는 AI 전송 안내 문구 */
 export function AiTransmissionNotice() {
   return (
-    <p
+    <div
       role="note"
-      className="rounded-lg border border-sky-300 bg-sky-50 px-4 py-3 text-sm text-sky-950 dark:border-sky-700 dark:bg-sky-950 dark:text-sky-100"
+      className="flex items-start gap-3 rounded-3xl bg-surface p-5 text-sm leading-6 shadow-[0_2px_24px_rgba(0,0,0,0.06)] ring-1 ring-line"
     >
-      {NOTICE_AI_TRANSMISSION}
-    </p>
+      <span
+        aria-hidden="true"
+        className="flex size-7 shrink-0 items-center justify-center rounded-full bg-accent-soft text-sm font-bold text-accent-text"
+      >
+        i
+      </span>
+      <p>{NOTICE_AI_TRANSMISSION}</p>
+    </div>
   );
 }

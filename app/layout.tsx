@@ -15,12 +15,18 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="ko" className="h-full antialiased">
       <body className="flex min-h-full flex-col break-keep">
-        <header className="border-b border-zinc-200 dark:border-zinc-800">
-          <div className="mx-auto max-w-3xl px-4 py-4">
-            <p className="text-lg font-bold">{SERVICE_NAME}</p>
-            <p className="text-sm text-zinc-600 dark:text-zinc-400">
-              {SERVICE_TAGLINE}
-            </p>
+        <header className="border-b border-line bg-surface">
+          <div className="mx-auto flex max-w-5xl items-center gap-3 px-4 py-4">
+            <span
+              aria-hidden="true"
+              className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-accent text-xl font-bold text-white shadow-md"
+            >
+              +
+            </span>
+            <div>
+              <p className="text-lg font-bold leading-6">{SERVICE_NAME}</p>
+              <p className="text-sm leading-5 text-muted">{SERVICE_TAGLINE}</p>
+            </div>
           </div>
         </header>
         <CommonNotices />

@@ -1,23 +1,57 @@
 @import "tailwindcss";
 
+/*
+ * 화면 분위기: 연한 회색 배경 위에 둥근 흰 카드, 주황색 포인트 (참고 이미지 기준)
+ * 색은 아래 변수 한곳에서만 정하고, 화면에서는 bg-surface, text-muted, text-accent 같은 이름으로 쓴다.
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f4f4f5;
+  --foreground: #1c1917;
+  --surface: #ffffff; /* 카드 바탕 */
+  --muted: #57534e; /* 보조 글씨 (흰 바탕에서 대비 충분) */
+  --line: #e7e5e4; /* 테두리 */
+  --accent: #f26a1b; /* 포인트 주황: 아이콘·큰 글씨·버튼 */
+  --accent-text: #c2410c; /* 작은 글씨용 진한 주황 (대비 확보) */
+  --accent-soft: #fff1e6; /* 연한 주황 바탕 */
+  --accent-soft-2: #ffe0c7; /* 연한 주황 그라데이션 끝 */
+  --notice-bg: #fff4e5; /* 안내 띠 */
+  --notice-line: #fdba74;
+  --notice-text: #7c2d12;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0e0e0f;
+    --foreground: #f5f5f4;
+    --surface: #1a1a1c;
+    --muted: #a8a29e;
+    --line: #2b2b2e;
+    --accent: #ff7a2f;
+    --accent-text: #fdba74;
+    --accent-soft: #2a1a10;
+    --accent-soft-2: #3a2314;
+    --notice-bg: #2a1a10;
+    --notice-line: #7c3f14;
+    --notice-text: #fed7aa;
+  }
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-text: var(--accent-text);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-soft-2: var(--accent-soft-2);
+  --color-notice-bg: var(--notice-bg);
+  --color-notice-line: var(--notice-line);
+  --color-notice-text: var(--notice-text);
   /* 한글이 들어간 화면이라 한글 글꼴을 먼저 찾도록 정한다. 사용자 기기에 있는 글꼴을 쓴다. */
   --font-sans: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR",
     system-ui, sans-serif;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
