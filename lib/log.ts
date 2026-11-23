@@ -3,7 +3,7 @@
 //
 // 이 파일은 저장 방식과 상관없는 순수 함수만 둔다(시험하기 쉽도록). 실제 저장은 components/logStore.ts가 맡는다.
 
-import { PAIN_BLOCK_THRESHOLD, PAIN_MAX, PAIN_MIN } from "./constants";
+import { PAIN_BLOCK_THRESHOLD, PAIN_MAX, PAIN_MIN, type BodyPart } from "./constants";
 
 export const LOG_KEY = "exercise-log-v1";
 /** 브라우저 저장 공간을 아끼려고 기록은 최근 이만큼만 남긴다. */
@@ -135,6 +135,18 @@ export function summarizeByExercise(entries: LogEntry[]): ExerciseSummary[] {
   return [...byExercise.entries()]
     .sort((a, b) => b[1].lastAt - a[1].lastAt)
     .map(([exerciseId, v]) => ({ exerciseId, count: v.count, lastDate: v.lastDate }));
+}
+
+/**
+ * 기록 첫 화면의 부위 탭: 고른 부위를 다루는 운동만 남긴다. part가 null이면 전체.
+ * 한 운동이 여러 부위(예: 발목·무릎)를 다루면 그 부위 탭마다 나온다.
+ */
+export function summariesForPart(
+  summaries: ExerciseSummary[],
+  part: BodyPart | null,
+  partsOf: (exerciseId: string) => BodyPart[],
+): ExerciseSummary[] {
+  return part === null ? summaries : summaries.filter((s) => partsOf(s.exerciseId).includes(part));
 }
 
 // ---- 통증 변화 분석 ----

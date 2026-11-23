@@ -53,7 +53,7 @@ export function ExerciseLogView({ exerciseId }: { exerciseId: string }) {
         {name}
       </h1>
       <p className="mt-3 text-sm text-muted">
-        기록 {entries.length}번 ·{" "}
+        {exercise ? `${exercise.bodyParts.join("·")} · ` : ""}기록 {entries.length}번 ·{" "}
         <Link href={`/guide/${exerciseId}`} className="underline underline-offset-4">
           운동 가이드 보기
         </Link>

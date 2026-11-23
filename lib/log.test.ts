@@ -10,6 +10,7 @@ import {
   removeEntry,
   serializeLog,
   shouldAdviseStop,
+  summariesForPart,
   summarizeByExercise,
 } from "./log";
 import { FORBIDDEN_TERMS } from "./constants";
@@ -113,5 +114,40 @@ describe("운동별 요약(기록 첫 화면)", () => {
 
   it("기록이 없으면 빈 목록", () => {
     expect(summarizeByExercise([])).toEqual([]);
+  });
+});
+
+describe("부위 탭", () => {
+  const parts: Record<string, ("발목" | "무릎" | "어깨")[]> = {
+    a: ["발목"],
+    b: ["발목", "무릎"],
+    c: ["어깨"],
+  };
+  const partsOf = (id: string) => parts[id] ?? [];
+  const list = summarizeByExercise([
+    makeEntry("a", 0, 1, at("2026-11-21T09:00:00")),
+    makeEntry("b", 0, 1, at("2026-11-22T09:00:00")),
+    makeEntry("c", 0, 1, at("2026-11-23T09:00:00")),
+    makeEntry("zzz", 0, 1, at("2026-11-24T09:00:00")),
+  ]);
+
+  it("전체(null)는 모든 운동이다", () => {
+    expect(summariesForPart(list, null, partsOf)).toHaveLength(4);
+  });
+
+  it("부위를 고르면 그 부위를 다루는 운동만 남는다(여러 부위 운동은 각 탭에 모두 나온다)", () => {
+    expect(summariesForPart(list, "발목", partsOf).map((x) => x.exerciseId).sort()).toEqual(["a", "b"]);
+    expect(summariesForPart(list, "무릎", partsOf).map((x) => x.exerciseId)).toEqual(["b"]);
+    expect(summariesForPart(list, "어깨", partsOf).map((x) => x.exerciseId)).toEqual(["c"]);
+  });
+
+  it("목록에 없는 운동(부위를 모르는 운동)은 전체에만 나온다", () => {
+    for (const part of ["발목", "무릎", "어깨"] as const) {
+      expect(summariesForPart(list, part, partsOf).some((x) => x.exerciseId === "zzz")).toBe(false);
+    }
+  });
+
+  it("기록이 없는 부위는 빈 목록", () => {
+    expect(summariesForPart([], "무릎", partsOf)).toEqual([]);
   });
 });
