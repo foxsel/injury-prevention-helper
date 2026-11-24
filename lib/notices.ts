@@ -30,7 +30,7 @@ export const RESULT_MESSAGES = {
 
 /** 첫 화면에만 보이는 AI 전송 안내 문구 (PRD 7번 원문) */
 export const NOTICE_AI_TRANSMISSION =
-  "입력한 내용(종목·부위·통증 점수)은 AI 서비스로 전송되어 답변을 만드는 데 사용됩니다";
+  "입력한 내용(종목·사용 유형·부위·통증 점수)은 AI 서비스(OpenAI)로 전송되어 답변을 만드는 데 사용됩니다";
 
 /** 진행 기록 화면의 안내 문구 */
 export const LOG_MESSAGES = {

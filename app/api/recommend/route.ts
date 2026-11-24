@@ -12,6 +12,20 @@ export const maxDuration = 30;
 const NO_STORE = { "Cache-Control": "no-store" };
 
 export async function POST(request: Request) {
+  // 우리 화면은 항상 JSON으로 보낸다. 다른 형식(예: 다른 사이트가 사전 확인 없이 보내는 text/plain)은
+  // AI를 부르기 전에 거절해, 남의 사이트가 방문자 브라우저로 몰래 호출하는 길을 막는다.
+  const contentType = request.headers.get("content-type") ?? "";
+  if (!contentType.toLowerCase().startsWith("application/json")) {
+    return Response.json(
+      {
+        status: "error",
+        code: "INVALID_INPUT",
+        issues: [{ field: "", message: "요청 형식이 올바르지 않습니다." }],
+      },
+      { status: 415, headers: NO_STORE },
+    );
+  }
+
   // 본문을 읽기 전에 선언된 크기부터 확인한다.
   const declaredLength = Number(request.headers.get("content-length"));
   if (Number.isFinite(declaredLength) && declaredLength > MAX_REQUEST_BYTES) {
