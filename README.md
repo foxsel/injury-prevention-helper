@@ -53,4 +53,4 @@ AI 추천을 쓰려면 프로젝트 폴더에 `.env` 파일을 만들고 `OPENAI
 
 ## 기술
 
-Next.js 16(App Router) · React 19 · TypeScript · Tailwind CSS 4 · OpenAI SDK · zod · Vitest. 배포는 Vercel을 계획하고 있으며 아직 배포하지 않았습니다.
+Next.js 16(App Router) · React 19 · TypeScript · Tailwind CSS 4 · OpenAI SDK · zod · Vitest. Vercel에 배포했습니다: https://injury-prevention-helper.vercel.app (소스: https://github.com/foxsel/injury-prevention-helper)
