@@ -6,7 +6,7 @@
 > **작성자**: 이성은
 > **작성일**: 2026-11-23
 > **상태**: 1~12번과 14번(nice) 구현 완료, 13번(Vercel 배포)만 남음 — 2026-11-24 최종 점검에서 갱신
-> **기획서**: [PRD.md](PRD.md) / **설계서**: [DESIGN.md](DESIGN.md) / **보고서**: [REPORT.md](REPORT.md)
+> **기획서**: [PRD.md](PRD.md) / **설계서**: [DESIGN.md](DESIGN.md)
 
 ---
 

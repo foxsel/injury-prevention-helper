@@ -1,7 +1,10 @@
 // Design Ref: §11 시험 계획 — AI 응답 읽기 시험. (실제 AI 호출은 이 시험에서 하지 않는다.)
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { parseAiIds } from "./ai";
 import { AiFailedError } from "./aiErrors";
+
+// 'server-only'는 서버 컴포넌트 환경이 아니면 불러올 때 오류를 내는 잠금이다. 시험 환경에서는 비워 둔다.
+vi.mock("server-only", () => ({}));
 
 describe("parseAiIds", () => {
   it("약속한 JSON에서 id 목록을 꺼낸다", () => {

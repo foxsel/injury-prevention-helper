@@ -26,10 +26,10 @@ import {
 
 /**
  * 손 사진 묶음(2×2, 흰 배경 위 흑백 손 네 장)의 주소.
- * 브라우저에서 읽어 점으로 바꾸는 재료로만 쓴다. 주소가 막히면 손 없이 글과 버튼만 보인다.
+ * 브라우저에서 읽어 점으로 바꾸는 재료로만 쓴다. 파일을 못 읽으면 손 없이 글과 버튼만 보인다.
+ * 방문자 정보가 제3자 서버로 나가지 않도록 외부 주소가 아니라 프로젝트의 public/hands.webp를 쓴다.
  */
-export const HANDS_SHEET_URL =
-  "https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20261030_025250_100df7b8-31fd-4614-aa4a-c1b7d5b6b273.png&w=1600&q=85";
+export const HANDS_SHEET_URL = "/hands.webp";
 
 const TILE_WIDTH = 420;
 type TileKey = keyof typeof SRC;

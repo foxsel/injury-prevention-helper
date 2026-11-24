@@ -4,6 +4,8 @@
 // 이 파일은 서버 코드(추천 API)에서만 불러온다. 브라우저 코드가 불러오면 안 된다.
 // 키 이름에 NEXT_PUBLIC_을 붙이지 않았으므로 브라우저에는 키가 전달되지 않는다.
 
+// 서버 전용 잠금: 브라우저 코드가 이 파일을 불러오면 빌드가 실패해 키·OpenAI 도구가 화면 쪽에 섞이는 실수를 막는다.
+import "server-only";
 import OpenAI, { APIConnectionTimeoutError } from "openai";
 import { z } from "zod";
 import { MAX_RECOMMENDATIONS } from "./constants";

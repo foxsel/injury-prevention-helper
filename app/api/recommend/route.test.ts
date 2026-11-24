@@ -1,7 +1,10 @@
 // Design Ref: §6 API 명세, §10 보안 — 추천 API가 JSON이 아닌 요청을 AI 호출 전에 거절하는지 확인한다.
 // 아래 요청은 모두 AI를 부르기 전에 끝나므로 OpenAI 키 없이도 안전하게 시험할 수 있다.
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { POST } from "./route";
+
+// 'server-only'는 서버 컴포넌트 환경이 아니면 불러올 때 오류를 내는 잠금이다. 시험 환경에서는 비워 둔다.
+vi.mock("server-only", () => ({}));
 
 function req(body: string, headers: Record<string, string> = {}): Request {
   return new Request("http://localhost/api/recommend", { method: "POST", body, headers });
